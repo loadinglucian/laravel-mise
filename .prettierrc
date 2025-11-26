@@ -1,8 +1,13 @@
 {
   "plugins": [],
+  "tabWidth": 4,
+  "useTabs": false,
+  "endOfLine": "lf",
+  "insertFinalNewline": true,
+  "singleQuote": true,
   "overrides": [
     {
-      "files": ["*.json", "*.yml", "*.yaml", ".prettierrc"],
+      "files": ["*.yml", "*.yaml", ".prettierrc"],
       "options": {
         "tabWidth": 2
       }

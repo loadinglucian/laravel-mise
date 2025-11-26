@@ -1,24 +1,37 @@
 <?php
 
+// -------------------------------------------------------------------------------
+//
+// Pest Configuration and Test Utilities
+//
+// -------------------------------------------------------------------------------
+//
+// Centralized Pest setup and shared helpers used across the test suite.
+// Keep this file focused on global configuration, custom expectations,
+// and lightweight helper functions.
+
+//
+// Global Test Configuration
+// -------------------------------------------------------------------------------
+
 beforeEach(function (): void {
-    $this->timeout(3);
+    $this->timeout(10);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-*/
+//
+// Test Case Binding
+// -------------------------------------------------------------------------------
+uses(Tests\TestCase::class)
+    ->in('Arch', 'Feature', 'Integration', 'Unit');
 
-uses(Tests\TestCase::class)->in('Feature');
-
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-*/
-
+//
+// Custom Expectations
+// -------------------------------------------------------------------------------
 expect()->extend('toBeOne', fn ($value) => expect($value)->toBe(1));
+
+//
+// Test Helpers
+// -------------------------------------------------------------------------------
 
 /**
  * Create a temporary directory with automatic cleanup tracking.

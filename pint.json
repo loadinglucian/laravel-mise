@@ -1,7 +1,4 @@
 {
-  "preset": "laravel",
-  "paths": [
-    "src/",
-    "tests/"
-  ]
+    "preset": "laravel",
+    "paths": ["config/", "dist/", "src/", "tests/"]
 }
