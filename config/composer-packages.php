@@ -19,6 +19,33 @@ return [
         ],
     ],
     'require-dev' => [
+        'bigpixelrocket/laravel-omakase:dev-main' => [
+            'composer' => [
+                'scripts' => [
+                    'changed-php-files' => [
+                        './scripts/get-changed-php-files.sh',
+                    ],
+                    'changed-php-files:no-tests' => [
+                        './scripts/get-changed-php-files.sh | grep -v "^tests/"',
+                    ],
+                    'pall' => [
+                        'composer pest && composer rect && composer pstan && composer pint',
+                    ],
+                    'pest' => [
+                        'vendor/bin/pest --parallel --coverage',
+                    ],
+                    'pint' => [
+                        'bash -c "FILES=$(composer changed-php-files 2>/dev/null | tail -n +2); if [ -n \'$FILES\' ]; then echo \'$FILES\' | xargs -r ./vendor/bin/pint --parallel; else echo \'No PHP files changed\'; fi"',
+                    ],
+                    'pstan' => [
+                        'bash -c "FILES=$(composer changed-php-files:no-tests 2>/dev/null | tail -n +2); if [ -n \'$FILES\' ]; then echo \'$FILES\' | xargs -r ./vendor/bin/phpstan analyse --memory-limit=2G --; else echo \'No non-test PHP files changed\'; fi"',
+                    ],
+                    'rect' => [
+                        'bash -c "FILES=$(composer changed-php-files 2>/dev/null | tail -n +2); if [ -n \'$FILES\' ]; then echo \'$FILES\' | xargs -r ./vendor/bin/rector process; else echo \'No PHP files changed\'; fi"',
+                    ],
+                ],
+            ],
+        ],
         'barryvdh/laravel-debugbar' => [
             'commands' => [
                 ['php', 'artisan', 'vendor:publish', '--provider=Barryvdh\Debugbar\ServiceProvider'],
@@ -59,6 +86,7 @@ return [
             ],
         ],
         'pestphp/pest',
+        'pestphp/pest-plugin-arch',
         'roave/security-advisories:dev-latest',
     ],
 ];

@@ -4,11 +4,17 @@ includes:
 
 parameters:
     paths:
+        - config/
         - dist/
         - src/
 
     excludePaths:
+        - dist/tests/Feature/
+        - dist/tests/Integration/
+        - dist/tests/Unit/
         - dist/tests/Pest.php
+        - dist/tests/TestCase.php
+        - dist/tests/FeatureTestCase.php
 
     # Level 10 is the highest level
     level: 10

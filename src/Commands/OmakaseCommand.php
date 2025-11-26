@@ -29,7 +29,7 @@ class OmakaseCommand extends Command
         {--skip-composer-json : Skip modifying composer.json}
         {--force : Override existing files and skip confirmation prompts}';
 
-    protected $description = 'An opinionated menu for your next Laravel project';
+    protected $description = 'An opinionated Laravel menu';
 
     //
     // Post-Distribution Commands Collection

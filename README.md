@@ -20,7 +20,7 @@ An opinionated Laravel package that provides a curated selection of packages and
 Install the package via Composer:
 
 ```bash
-composer require --dev bigpixelrocket/laravel-omakase
+composer require --dev bigpixelrocket/laravel-omakase:dev-main
 ```
 
 The package will automatically register itself via Laravel's package discovery.
@@ -117,13 +117,11 @@ php artisan db:migrate --force --seed
 The package copies the following configuration files to your project:
 
 - **Code Quality:**
-
   - `phpstan.neon` - PHPStan configuration
   - `pint.json` - Laravel Pint configuration
   - `.prettierrc` - Prettier configuration
 
 - **Development:**
-
   - `TESTING.md` - Testing guidelines and best practices
   - `AGENTS.md` - AI agent guidelines
   - `CLAUDE.md` - Claude AI specific guidelines

@@ -5,24 +5,20 @@
          colors="true"
 >
     <testsuites>
-        <testsuite name="Unit">
-            <directory>tests/Unit</directory>
-        </testsuite>
         <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+            <directory suffix="Test.php">tests/Feature</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
     </testsuites>
     <source>
         <include>
             <directory>app</directory>
         </include>
-        <exclude>
-            <directory>app/Livewire/Auth</directory>
-            <directory>app/Livewire/Settings</directory>
-            <file>app/Http/Controllers/Auth/VerifyEmailController.php</file>
-            <file>app/Livewire/Actions/Logout.php</file>
-            <file>app/Providers/TelescopeServiceProvider.php</file>
-        </exclude>
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>

@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 beforeEach(function (): void {
-    $this->timeout(3);
+    $this->timeout(5);
 });
 
 /*
@@ -15,9 +17,23 @@ beforeEach(function (): void {
 |
 */
 
-pest()->extend(Tests\TestCase::class)
+// Architecture Tests: Architecture rules and best practices
+pest()->extend(Tests\FeatureTestCase::class)
+    ->in('Arch');
+
+// Feature Tests: Full HTTP stack end-to-end tests
+pest()->extend(Tests\FeatureTestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
+
+// Integration Tests: Multiple components, database, real services
+pest()->extend(Tests\TestCase::class)
+    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Integration');
+
+// Unit Tests: Pure business logic, mocked dependencies, no database
+pest()->extend(Tests\TestCase::class)
+    ->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
