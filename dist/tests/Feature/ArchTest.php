@@ -73,7 +73,7 @@ arch()
 
 arch()
     ->expect('App\Models')
-    ->toExtend('Illuminate\Database\Eloquent\Model');
+    ->toExtend(\Illuminate\Database\Eloquent\Model::class);
 
 arch()
     ->expect('App\Exceptions')
@@ -109,7 +109,7 @@ arch()
 
 arch()
     ->expect('App\Repositories')
-    ->toImplement('App\Contracts\RepositoryInterface');
+    ->toImplement(\App\Contracts\RepositoryInterface::class);
 
 //
 // Conditional Architecture Tests
@@ -140,10 +140,6 @@ it('services implement service contracts when defined', function (): void {
     arch()
         ->expect('App\Services')
         ->classes()
-        ->when(function (ReflectionClass $class): bool {
-            return interface_exists("App\\Contracts\\{$class->getShortName()}Interface");
-        })
-        ->toImplement(function (ReflectionClass $class): string {
-            return "App\\Contracts\\{$class->getShortName()}Interface";
-        });
+        ->when(fn(ReflectionClass $class): bool => interface_exists("App\\Contracts\\{$class->getShortName()}Interface"))
+        ->toImplement(fn(ReflectionClass $class): string => "App\\Contracts\\{$class->getShortName()}Interface");
 });
