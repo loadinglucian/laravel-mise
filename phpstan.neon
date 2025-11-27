@@ -10,6 +10,7 @@ parameters:
 
     excludePaths:
         - dist/tests/
+        - tests/
 
     # Level 10 is the highest level
     level: 10

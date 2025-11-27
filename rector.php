@@ -11,6 +11,8 @@ return RectorConfig::configure()
         FileCacheStorage::class,
     )
     ->withPaths([
+        __DIR__.'/config',
+        __DIR__.'/dist',
         __DIR__.'/src',
         __DIR__.'/tests',
     ])
