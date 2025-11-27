@@ -42,7 +42,7 @@ class DbMigrateCommand extends Command
             '--step' => $this->option('step'),
             '--graceful' => $this->option('graceful'),
             '--isolated' => $this->option('isolated'),
-        ], fn ($value) => $this->isValidOption($value));
+        ], $this->isValidOption(...));
 
         return $this->call('migrate', $options);
     }

@@ -643,12 +643,7 @@ class BuffetCommand extends Command
     protected function commandExists(array $commands, string $targetCommand): bool
     {
         $normalizedTarget = $this->normalizeCommand($targetCommand);
-        foreach ($commands as $command) {
-            if (is_string($command) && $this->normalizeCommand($command) === $normalizedTarget) {
-                return true;
-            }
-        }
 
-        return false;
+        return array_any($commands, fn ($command) => is_string($command) && $this->normalizeCommand($command) === $normalizedTarget);
     }
 }
