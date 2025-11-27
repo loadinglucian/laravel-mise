@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Bigpixelrocket\LaravelOmakase\Commands;
+namespace Bigpixelrocket\LaravelBuffet\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 
 //
-// Omakase Command - Laravel Package Installation & Configuration
+// Buffet Command - Laravel Package Installation & Configuration
 // -------------------------------------------------------------------------------
 //
 // This command provides an opinionated selection of packages and configurations
 // for Laravel projects. It handles Composer packages, NPM packages, and copies
 // predefined configuration files.
 
-class OmakaseCommand extends Command
+class BuffetCommand extends Command
 {
     //
     // Command Definition
     // -------------------------------------------------------------------------------
 
-    protected $signature = 'laravel:omakase
+    protected $signature = 'laravel:buffet
         {--files : Only copy files}
         {--composer : Install only composer packages}
         {--npm : Install only npm packages}
@@ -68,7 +68,7 @@ class OmakaseCommand extends Command
             }
             $this->newLine();
 
-            $composerPackages = config('laravel-omakase.composer-packages');
+            $composerPackages = config('laravel-buffet.composer-packages');
 
             if (! is_array($composerPackages)) {
                 $this->error('Invalid composer packages configuration');
@@ -99,7 +99,7 @@ class OmakaseCommand extends Command
             }
             $this->newLine();
 
-            $npmPackages = config('laravel-omakase.npm-packages');
+            $npmPackages = config('laravel-buffet.npm-packages');
 
             if (! is_array($npmPackages)) {
                 $this->error('Invalid npm packages configuration');

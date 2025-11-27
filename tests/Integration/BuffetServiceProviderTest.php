@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use Bigpixelrocket\LaravelOmakase\Commands\OmakaseCommand;
-use Bigpixelrocket\LaravelOmakase\OmakaseServiceProvider;
+use Bigpixelrocket\LaravelBuffet\BuffetServiceProvider;
+use Bigpixelrocket\LaravelBuffet\Commands\BuffetCommand;
 use Illuminate\Support\Facades\Artisan;
 
-describe('OmakaseServiceProvider Integration Tests', function (): void {
+describe('BuffetServiceProvider Integration Tests', function (): void {
     it('is registered as a service provider in the package', function (): void {
         // ARRANGE
-        $expectedProviderClass = OmakaseServiceProvider::class;
+        $expectedProviderClass = BuffetServiceProvider::class;
 
         // ACT
         $loadedProviders = app()->getLoadedProviders();
@@ -22,12 +22,12 @@ describe('OmakaseServiceProvider Integration Tests', function (): void {
             ->and($loadedProviders[$expectedProviderClass])->toBe(true);
     });
 
-    it('registers the OmakaseCommand when running in console', function (): void {
+    it('registers the BuffetCommand when running in console', function (): void {
         // ARRANGE
-        $expectedCommandName = 'laravel:omakase';
+        $expectedCommandName = 'laravel:buffet';
 
         // ACT
-        $provider = new OmakaseServiceProvider(app());
+        $provider = new BuffetServiceProvider(app());
         $provider->register();
         $provider->boot();
         $registeredCommands = Artisan::all();
@@ -40,6 +40,6 @@ describe('OmakaseServiceProvider Integration Tests', function (): void {
             ->and($registeredCommands[$expectedCommandName]);
 
         // Verify the specific command instance is registered
-        expect($registeredCommands[$expectedCommandName])->toBeInstanceOf(OmakaseCommand::class);
+        expect($registeredCommands[$expectedCommandName])->toBeInstanceOf(BuffetCommand::class);
     });
 });

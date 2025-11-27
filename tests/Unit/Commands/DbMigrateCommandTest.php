@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Bigpixelrocket\LaravelOmakase\Commands\DbMigrateCommand;
+use Bigpixelrocket\LaravelBuffet\Commands\DbMigrateCommand;
 
 describe('DbMigrateCommand Unit Tests', function (): void {
     describe('command interface', function (): void {

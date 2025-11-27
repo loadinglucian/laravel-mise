@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Tests\Unit\Commands;
 
 use Illuminate\Support\Facades\Config;
-use Tests\Support\OmakaseCommandHelpers;
+use Illuminate\Support\Facades\Process;
+use Tests\Support\BuffetCommandHelpers;
 
-uses(OmakaseCommandHelpers::class);
+uses(BuffetCommandHelpers::class);
 
-describe('OmakaseCommand Unit Tests', function (): void {
+describe('BuffetCommand Unit Tests', function (): void {
     describe('configuration validation', function (): void {
         it('validates composer package configuration structure', function (): void {
             // ARRANGE
@@ -25,14 +26,14 @@ describe('OmakaseCommand Unit Tests', function (): void {
                 ],
             ];
 
-            Config::set('laravel-omakase.composer-packages', $validConfig);
+            Config::set('laravel-buffet.composer-packages', $validConfig);
 
             // ACT & ASSERT
-            expect(config('laravel-omakase.composer-packages'))
+            expect(config('laravel-buffet.composer-packages'))
                 ->toHaveKeys(['require', 'require-dev'])
-                ->and(config('laravel-omakase.composer-packages.require'))
+                ->and(config('laravel-buffet.composer-packages.require'))
                 ->toHaveKey('package/name')
-                ->and(config('laravel-omakase.composer-packages.require.package/name'))
+                ->and(config('laravel-buffet.composer-packages.require.package/name'))
                 ->toHaveKeys(['commands', 'post_dist_commands']);
         });
 
@@ -43,34 +44,35 @@ describe('OmakaseCommand Unit Tests', function (): void {
                 'devDependencies' => ['dev-package', 'test-package'],
             ];
 
-            Config::set('laravel-omakase.npm-packages', $validConfig);
+            Config::set('laravel-buffet.npm-packages', $validConfig);
 
             // ACT & ASSERT
-            expect(config('laravel-omakase.npm-packages'))
+            expect(config('laravel-buffet.npm-packages'))
                 ->toHaveKeys(['dependencies', 'devDependencies'])
-                ->and(config('laravel-omakase.npm-packages.dependencies'))
+                ->and(config('laravel-buffet.npm-packages.dependencies'))
                 ->toBeArray()
                 ->toContain('package-name')
-                ->and(config('laravel-omakase.npm-packages.devDependencies'))
+                ->and(config('laravel-buffet.npm-packages.devDependencies'))
                 ->toBeArray()
                 ->toContain('dev-package');
         });
 
         it('handles invalid configuration gracefully', function (mixed $invalidConfig, string $configKey): void {
             // ARRANGE
+            Process::fake();
             Config::set($configKey, $invalidConfig);
 
             // ACT
-            $result = $this->runOmakaseWithOptions([$configKey === 'laravel-omakase.composer-packages' ? '--composer' : '--npm' => true]);
+            $result = $this->runBuffetWithOptions([$configKey === 'laravel-buffet.composer-packages' ? '--composer' : '--npm' => true]);
 
             // ASSERT
             $result->expectsOutputToContain('Invalid')
                 ->assertFailed();
         })->with([
-            'invalid composer config' => ['invalid-string', 'laravel-omakase.composer-packages'],
-            'invalid npm config' => ['invalid-string', 'laravel-omakase.npm-packages'],
-            'null composer config' => [null, 'laravel-omakase.composer-packages'],
-            'null npm config' => [null, 'laravel-omakase.npm-packages'],
+            'invalid composer config' => ['invalid-string', 'laravel-buffet.composer-packages'],
+            'invalid npm config' => ['invalid-string', 'laravel-buffet.npm-packages'],
+            'null composer config' => [null, 'laravel-buffet.composer-packages'],
+            'null npm config' => [null, 'laravel-buffet.npm-packages'],
         ]);
 
         it('processes package configurations correctly', function (): void {
@@ -90,17 +92,17 @@ describe('OmakaseCommand Unit Tests', function (): void {
                 'devDependencies' => ['jest', 'webpack'],
             ];
 
-            Config::set('laravel-omakase.composer-packages', $composerConfig);
-            Config::set('laravel-omakase.npm-packages', $npmConfig);
+            Config::set('laravel-buffet.composer-packages', $composerConfig);
+            Config::set('laravel-buffet.npm-packages', $npmConfig);
 
             // ACT & ASSERT
-            expect(config('laravel-omakase.composer-packages.require'))
+            expect(config('laravel-buffet.composer-packages.require'))
                 ->toContain('simple/package')
-                ->and(config('laravel-omakase.composer-packages.require.complex/package'))
+                ->and(config('laravel-buffet.composer-packages.require.complex/package'))
                 ->toHaveKeys(['commands', 'post_dist_commands'])
-                ->and(config('laravel-omakase.npm-packages.dependencies'))
+                ->and(config('laravel-buffet.npm-packages.dependencies'))
                 ->toContain('react', 'vue')
-                ->and(config('laravel-omakase.npm-packages.devDependencies'))
+                ->and(config('laravel-buffet.npm-packages.devDependencies'))
                 ->toContain('jest', 'webpack');
         });
 
@@ -110,15 +112,15 @@ describe('OmakaseCommand Unit Tests', function (): void {
                 'require' => [$packageName => []],
             ];
 
-            Config::set('laravel-omakase.composer-packages', $config);
+            Config::set('laravel-buffet.composer-packages', $config);
 
             // ACT & ASSERT
             if ($isValid) {
-                expect(config('laravel-omakase.composer-packages.require'))
+                expect(config('laravel-buffet.composer-packages.require'))
                     ->toHaveKey($packageName);
             } else {
                 // Invalid package names might still be stored but should be handled appropriately
-                expect(config('laravel-omakase.composer-packages.require'))
+                expect(config('laravel-buffet.composer-packages.require'))
                     ->toHaveKey($packageName);
             }
         })->with([

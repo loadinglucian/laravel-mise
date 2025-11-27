@@ -1,11 +1,11 @@
 {
-    "name": "bigpixelrocket/laravel-omakase",
-    "description": "A Laravel package that provides the omakase command",
+    "name": "bigpixelrocket/laravel-buffet",
+    "description": "An opinionated Laravel package that installs and configures a curated selection of development tools and packages",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "LucianLoading\\LaravelOmakase\\": "src/"
+            "Bigpixelrocket\\LaravelBuffet\\": "src/"
         }
     },
     "authors": [
@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "LucianLoading\\LaravelOmakase\\OmakaseServiceProvider"
+                "Bigpixelrocket\\LaravelBuffet\\BuffetServiceProvider"
             ]
         }
     },

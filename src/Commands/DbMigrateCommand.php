@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bigpixelrocket\LaravelOmakase\Commands;
+namespace Bigpixelrocket\LaravelBuffet\Commands;
 
 use Illuminate\Console\Command;
 
