@@ -14,4 +14,7 @@ return RectorConfig::configure()
         __DIR__.'/src',
         __DIR__.'/tests',
     ])
-    ->withPhpSets();
+    ->withPhpSets()
+    ->withSkip([
+        __DIR__.'/tests/CICanary.php',
+    ]);
