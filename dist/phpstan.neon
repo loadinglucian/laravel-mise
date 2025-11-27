@@ -3,19 +3,12 @@ includes:
     - vendor/nesbot/carbon/extension.neon
 
 parameters:
-
     paths:
         - app/
-        - database/seeders/
+        - database/
+
+    excludePaths:
         - tests/
 
     # Level 10 is the highest level
     level: 10
-
-    excludePaths:
-        - tests/Feature/
-        - tests/Integration/
-        - tests/Unit/
-        - tests/CreatesApplication.php
-        - tests/Pest.php
-        - tests/TestCase.php
