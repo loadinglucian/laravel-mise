@@ -21,11 +21,11 @@ jobs:
           flux-username: ${{ secrets.FLUX_USERNAME }}
           flux-license-key: ${{ secrets.FLUX_LICENSE_KEY }}
 
-      - name: Setup Node.js and NPM
-        uses: ./.github/actions/setup-node
+      - name: Setup Bun
+        uses: ./.github/actions/setup-bun
 
       - name: Build frontend
-        run: npm run build
+        run: bun run build
 
       - name: Generate APP_KEY
         run: php artisan key:generate --env=testing --force
