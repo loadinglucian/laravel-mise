@@ -140,6 +140,6 @@ it('services implement service contracts when defined', function (): void {
     arch()
         ->expect('App\Services')
         ->classes()
-        ->when(fn(ReflectionClass $class): bool => interface_exists("App\\Contracts\\{$class->getShortName()}Interface"))
-        ->toImplement(fn(ReflectionClass $class): string => "App\\Contracts\\{$class->getShortName()}Interface");
+        ->when(fn (ReflectionClass $class): bool => interface_exists("App\\Contracts\\{$class->getShortName()}Interface"))
+        ->toImplement(fn (ReflectionClass $class): string => "App\\Contracts\\{$class->getShortName()}Interface");
 });
