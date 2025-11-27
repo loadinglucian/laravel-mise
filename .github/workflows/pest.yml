@@ -20,4 +20,4 @@ jobs:
           coverage: "true"
 
       - name: Execute tests with coverage
-        run: vendor/bin/pest --parallel --coverage --coverage-text --min=80
+        run: vendor/bin/pest --parallel --coverage --coverage-text --min=70

@@ -1,14 +1,14 @@
 <?php
 
 //
-// Shared Omakase Command Test Helpers
+// Shared Buffet Command Test Helpers
 // -------------------------------------------------------------------------------
 
 declare(strict_types=1);
 
 namespace Tests\Support;
 
-use Bigpixelrocket\LaravelOmakase\Commands\OmakaseCommand;
+use Bigpixelrocket\LaravelBuffet\Commands\BuffetCommand;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
@@ -16,18 +16,18 @@ use Illuminate\Support\Facades\Process;
 
 use function Pest\Laravel\artisan;
 
-trait OmakaseCommandHelpers
+trait BuffetCommandHelpers
 {
     //
     // Command Execution
     // -------------------------------------------------------------------------------
 
     /**
-     * Run omakase command with options
+     * Run buffet command with options
      */
-    protected function runOmakaseWithOptions(array $options): \Illuminate\Testing\PendingCommand
+    protected function runBuffetWithOptions(array $options): \Illuminate\Testing\PendingCommand
     {
-        return artisan(OmakaseCommand::class, $options);
+        return artisan(BuffetCommand::class, $options);
     }
 
     //
@@ -75,7 +75,7 @@ trait OmakaseCommandHelpers
      */
     protected function setTestPackageConfigs(): void
     {
-        Config::set('laravel-omakase.composer-packages', [
+        Config::set('laravel-buffet.composer-packages', [
             'require' => [
                 'livewire/livewire' => [
                     'commands' => [
@@ -118,7 +118,7 @@ trait OmakaseCommandHelpers
             ],
         ]);
 
-        Config::set('laravel-omakase.npm-packages', [
+        Config::set('laravel-buffet.npm-packages', [
             'dependencies' => ['tailwindcss', '@tailwindcss/vite'],
             'devDependencies' => ['prettier', 'prettier-plugin-blade'],
         ]);
@@ -154,4 +154,3 @@ trait OmakaseCommandHelpers
             ->andReturn(true);
     }
 }
-

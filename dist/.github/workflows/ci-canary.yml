@@ -1,0 +1,43 @@
+name: CI Canary
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP and Composer
+        uses: ./.github/actions/setup-php-composer
+        with:
+          flux-username: ${{ secrets.FLUX_USERNAME }}
+          flux-license-key: ${{ secrets.FLUX_LICENSE_KEY }}
+
+      - name: Verify Pint fails on CICanary class
+        run: |
+          if vendor/bin/pint --test tests/CICanary.php; then
+            echo "ERROR: Pint should have failed on CICanary"
+            exit 1
+          fi
+
+      - name: Verify Rector fails on CICanary class
+        run: |
+          mkdir -p /tmp/rector
+          if vendor/bin/rector --dry-run tests/CICanary.php --config rector-canary.php; then
+            echo "ERROR: Rector should have failed on CICanary"
+            exit 1
+          fi
+
+      - name: Verify PHPStan fails on CICanary class
+        run: |
+          if vendor/bin/phpstan analyse tests/CICanary.php --level=10; then
+            echo "ERROR: PHPStan should have failed on CICanary"
+            exit 1
+          fi

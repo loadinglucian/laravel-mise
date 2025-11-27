@@ -1,14 +1,14 @@
-# Laravel Omakase
+# Laravel Buffet
 
-An opinionated Laravel package that provides a curated selection of packages and configurations for your next Laravel project. Just like omakase dining where the chef chooses the best ingredients for you, this package installs and configures a thoughtfully selected set of development tools and packages.
+An opinionated Laravel package that provides a curated selection of packages and configurations for your next Laravel project. This package installs and configures a thoughtfully selected set of development tools and packages.
 
 ## Features
 
-- 🎯 **Curated Package Selection**: Installs popular and well-maintained packages for modern Laravel development
-- ⚙️ **Pre-configured Tools**: Copies ready-to-use configuration files for development tools
-- 🔧 **Flexible Installation**: Choose to install only specific parts (composer packages, npm packages, or configuration files)
-- 📁 **GitHub Actions**: Includes pre-configured workflows for CI/CD
-- 🎨 **Code Quality Tools**: Sets up PHPStan, Pint, Pest, and Prettier with sensible defaults
+- **Curated Package Selection**: Installs popular and well-maintained packages for modern Laravel development
+- **Pre-configured Tools**: Copies ready-to-use configuration files for development tools
+- **Flexible Installation**: Choose to install only specific parts (composer packages, npm packages, or configuration files)
+- **GitHub Actions**: Includes pre-configured workflows for CI/CD
+- **Code Quality Tools**: Sets up PHPStan, Pint, Pest, and Prettier with sensible defaults
 
 ## Requirements
 
@@ -20,7 +20,7 @@ An opinionated Laravel package that provides a curated selection of packages and
 Install the package via Composer:
 
 ```bash
-composer require --dev bigpixelrocket/laravel-omakase:dev-main
+composer require --dev bigpixelrocket/laravel-buffet:dev-main
 ```
 
 The package will automatically register itself via Laravel's package discovery.
@@ -29,10 +29,10 @@ The package will automatically register itself via Laravel's package discovery.
 
 ### Install Everything (Recommended)
 
-Run the omakase command to install all packages and copy all configuration files:
+Run the buffet command to install all packages and copy all configuration files:
 
 ```bash
-php artisan laravel:omakase
+php artisan laravel:buffet
 ```
 
 The command will automatically configure your `composer.json` file with package-specific settings (like scripts and repositories) when installing certain packages. You'll be prompted to confirm these changes before they're applied.
@@ -43,19 +43,19 @@ You can choose to install only specific parts:
 
 ```bash
 # Install only Composer packages
-php artisan laravel:omakase --composer
+php artisan laravel:buffet --composer
 
 # Install only NPM packages
-php artisan laravel:omakase --npm
+php artisan laravel:buffet --npm
 
 # Copy only configuration files
-php artisan laravel:omakase --files
+php artisan laravel:buffet --files
 
 # Force overwrite existing files when copying
-php artisan laravel:omakase --files --force
+php artisan laravel:buffet --files --force
 
 # Skip composer.json modifications entirely
-php artisan laravel:omakase --skip-composer-json
+php artisan laravel:buffet --skip-composer-json
 ```
 
 ### Composer.json Configuration
@@ -117,28 +117,28 @@ php artisan db:migrate --force --seed
 The package copies the following configuration files to your project:
 
 - **Code Quality:**
-  - `phpstan.neon` - PHPStan configuration
-  - `pint.json` - Laravel Pint configuration
-  - `.prettierrc` - Prettier configuration
+    - `phpstan.neon` - PHPStan configuration
+    - `pint.json` - Laravel Pint configuration
+    - `.prettierrc` - Prettier configuration
 
 - **Development:**
-  - `TESTING.md` - Testing guidelines and best practices
-  - `AGENTS.md` - AI agent guidelines
-  - `CLAUDE.md` - Claude AI specific guidelines
-  - `.cursorrules` - Cursor IDE rules
-  - `.cursorignore` - Cursor ignore patterns
+    - `TESTING.md` - Testing guidelines and best practices
+    - `AGENTS.md` - AI agent guidelines
+    - `CLAUDE.md` - Claude AI specific guidelines
+    - `.cursorrules` - Cursor IDE rules
+    - `.cursorignore` - Cursor ignore patterns
 
 - **GitHub Integration:**
-  - `.github/workflows/pest.yml` - Pest testing workflow
-  - `.github/workflows/phpstan.yml` - PHPStan analysis workflow
-  - `.github/workflows/pint.yml` - Code style checking workflow
-  - `.github/workflows/dependabot-automerge.yml` - Dependabot auto-merge workflow
-  - `.github/dependabot.yml` - Dependabot configuration
-  - `.github/rulesets/protect_main.json` - Branch protection ruleset
+    - `.github/workflows/pest.yml` - Pest testing workflow
+    - `.github/workflows/phpstan.yml` - PHPStan analysis workflow
+    - `.github/workflows/pint.yml` - Code style checking workflow
+    - `.github/workflows/dependabot-automerge.yml` - Dependabot auto-merge workflow
+    - `.github/dependabot.yml` - Dependabot configuration
+    - `.github/rulesets/protect_main.json` - Branch protection ruleset
 
 ## Command Options
 
-### laravel:omakase Command
+### laravel:buffet Command
 
 | Option                 | Description                                               |
 | ---------------------- | --------------------------------------------------------- |

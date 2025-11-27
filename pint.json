@@ -1,4 +1,5 @@
 {
     "preset": "laravel",
-    "paths": ["config/", "dist/", "src/", "tests/"]
+    "paths": ["config/", "dist/", "src/", "tests/"],
+    "notName": ["CICanary.php"]
 }

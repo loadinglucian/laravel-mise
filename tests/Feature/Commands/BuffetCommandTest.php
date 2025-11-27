@@ -1,20 +1,20 @@
 <?php
 
 //
-// OmakaseCommand Feature Tests - End-to-end command behavior
+// BuffetCommand Feature Tests - End-to-end command behavior
 // -------------------------------------------------------------------------------
 
 declare(strict_types=1);
 
 namespace Tests\Feature\Commands;
 
-use Bigpixelrocket\LaravelOmakase\Commands\OmakaseCommand;
+use Bigpixelrocket\LaravelBuffet\Commands\BuffetCommand;
 use Illuminate\Support\Facades\Process;
-use Tests\Support\OmakaseCommandHelpers;
+use Tests\Support\BuffetCommandHelpers;
 
-uses(OmakaseCommandHelpers::class);
+uses(BuffetCommandHelpers::class);
 
-describe('OmakaseCommand Feature Tests', function (): void {
+describe('BuffetCommand Feature Tests', function (): void {
     beforeEach(function (): void {
         Process::fake();
         $this->setTestPackageConfigs();
@@ -22,11 +22,11 @@ describe('OmakaseCommand Feature Tests', function (): void {
 
     it('has correct command signature and defaults', function (): void {
         // ARRANGE
-        $command = new OmakaseCommand;
+        $command = new BuffetCommand;
         $definition = $command->getDefinition();
 
         // ACT & ASSERT
-        expect($command->getName())->toBe('laravel:omakase')
+        expect($command->getName())->toBe('laravel:buffet')
             ->and($definition->getOptions())->toHaveKeys(['composer', 'npm', 'files', 'skip-composer-json', 'force'])
             ->and($definition->getOption('composer')->getDefault())->toBeFalse()
             ->and($definition->getOption('npm')->getDefault())->toBeFalse()
@@ -35,7 +35,7 @@ describe('OmakaseCommand Feature Tests', function (): void {
 
     it('installs all packages by default', function (): void {
         // ARRANGE & ACT
-        $this->runOmakaseWithOptions(['--skip-composer-json' => true])
+        $this->runBuffetWithOptions(['--skip-composer-json' => true])
             ->expectsOutputToContain('Installing Composer Packages')
             ->expectsOutputToContain('Installing NPM Packages')
             ->expectsOutputToContain('Copying files')
@@ -48,7 +48,7 @@ describe('OmakaseCommand Feature Tests', function (): void {
 
     it('respects composer-only option', function (): void {
         // ARRANGE & ACT
-        $this->runOmakaseWithOptions(['--composer' => true, '--skip-composer-json' => true])
+        $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true])
             ->expectsOutputToContain('Installing Composer Packages')
             ->doesntExpectOutputToContain('Installing NPM Packages')
             ->assertSuccessful();
@@ -60,7 +60,7 @@ describe('OmakaseCommand Feature Tests', function (): void {
 
     it('respects npm-only option', function (): void {
         // ARRANGE & ACT
-        $this->runOmakaseWithOptions(['--npm' => true])
+        $this->runBuffetWithOptions(['--npm' => true])
             ->expectsOutputToContain('Installing NPM Packages')
             ->doesntExpectOutputToContain('Installing Composer Packages')
             ->assertSuccessful();
@@ -72,7 +72,7 @@ describe('OmakaseCommand Feature Tests', function (): void {
 
     it('respects files-only option', function (): void {
         // ARRANGE & ACT
-        $this->runOmakaseWithOptions(['--files' => true])
+        $this->runBuffetWithOptions(['--files' => true])
             ->expectsOutputToContain('Copying files')
             ->doesntExpectOutputToContain('Installing Composer Packages')
             ->doesntExpectOutputToContain('Installing NPM Packages')
@@ -82,4 +82,3 @@ describe('OmakaseCommand Feature Tests', function (): void {
         Process::assertNothingRan();
     });
 });
-

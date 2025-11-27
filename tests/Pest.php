@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // -------------------------------------------------------------------------------
 //
 // Pest Configuration and Test Utilities
@@ -36,7 +38,7 @@ expect()->extend('toBeOne', fn ($value) => expect($value)->toBe(1));
 /**
  * Create a temporary directory with automatic cleanup tracking.
  */
-function createTempDirectory(string $prefix = 'laravel_omakase_test_'): string
+function createTempDirectory(string $prefix = 'laravel_buffet_test_'): string
 {
     $dir = sys_get_temp_dir().'/'.$prefix.uniqid();
     \Illuminate\Support\Facades\File::ensureDirectoryExists($dir);

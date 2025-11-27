@@ -21,4 +21,4 @@ jobs:
           flux-license-key: ${{ secrets.FLUX_LICENSE_KEY }}
 
       - name: Execute Static Analysis
-        run: vendor/bin/phpstan analyse
+        run: vendor/bin/phpstan analyse --memory-limit=2G

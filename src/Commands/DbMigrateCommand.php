@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bigpixelrocket\LaravelOmakase\Commands;
+namespace Bigpixelrocket\LaravelBuffet\Commands;
 
 use Illuminate\Console\Command;
 
@@ -42,7 +42,7 @@ class DbMigrateCommand extends Command
             '--step' => $this->option('step'),
             '--graceful' => $this->option('graceful'),
             '--isolated' => $this->option('isolated'),
-        ], fn ($value) => $this->isValidOption($value));
+        ], $this->isValidOption(...));
 
         return $this->call('migrate', $options);
     }

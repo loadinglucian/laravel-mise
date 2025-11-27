@@ -8,11 +8,11 @@ use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
-use Tests\Support\OmakaseCommandHelpers;
+use Tests\Support\BuffetCommandHelpers;
 
-uses(OmakaseCommandHelpers::class);
+uses(BuffetCommandHelpers::class);
 
-describe('OmakaseCommand Integration Tests', function (): void {
+describe('BuffetCommand Integration Tests', function (): void {
     beforeEach(function (): void {
         Process::fake();
         $this->setTestPackageConfigs();
@@ -25,7 +25,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
     describe('package installation', function (): void {
         it('installs composer packages with correct command structure', function (): void {
             // ARRANGE & ACT
-            $this->runOmakaseWithOptions(['--composer' => true, '--skip-composer-json' => true])
+            $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true])
                 ->assertSuccessful();
 
             // ASSERT
@@ -56,7 +56,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
 
         it('installs npm packages correctly', function (): void {
             // ARRANGE & ACT
-            $this->runOmakaseWithOptions(['--npm' => true])
+            $this->runBuffetWithOptions(['--npm' => true])
                 ->assertSuccessful();
 
             // ASSERT
@@ -83,7 +83,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
 
         it('executes post-dist commands after installation', function (): void {
             // ARRANGE & ACT
-            $this->runOmakaseWithOptions(['--composer' => true, '--skip-composer-json' => true])
+            $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true])
                 ->assertSuccessful();
 
             // ASSERT
@@ -106,7 +106,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             ]);
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true, '--skip-composer-json' => true])
+            $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true])
                 ->expectsOutputToContain('Post-dist command failed but continuing...')
                 ->assertSuccessful();
 
@@ -126,7 +126,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             $this->mockComposerJsonWrite();
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true])
+            $this->runBuffetWithOptions(['--composer' => true])
                 ->expectsOutputToContain('Adding barryvdh/laravel-ide-helper configuration to composer.json (scripts)...')
                 ->expectsOutputToContain('Added post-update-cmd scripts to composer.json')
                 ->assertSuccessful();
@@ -154,7 +154,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             $this->mockComposerJsonWrite();
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true])
+            $this->runBuffetWithOptions(['--composer' => true])
                 ->expectsOutputToContain('Adding barryvdh/laravel-ide-helper configuration to composer.json (scripts)...')
                 ->expectsOutputToContain('Added 3 new script(s) to post-update-cmd')
                 ->assertSuccessful();
@@ -187,7 +187,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             ]);
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true])
+            $this->runBuffetWithOptions(['--composer' => true])
                 ->expectsOutputToContain('Adding barryvdh/laravel-ide-helper configuration to composer.json (scripts)...')
                 ->expectsOutputToContain('All required scripts already exist in post-update-cmd')
                 ->assertSuccessful();
@@ -208,7 +208,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             }
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true])
+            $this->runBuffetWithOptions(['--composer' => true])
                 ->expectsOutputToContain($expectedError)
                 ->assertSuccessful(); // Command continues despite errors
         })->with([
@@ -238,7 +238,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             }
 
             // ACT
-            $this->runOmakaseWithOptions($options)
+            $this->runBuffetWithOptions($options)
                 ->expectsOutputToContain($expectedBehavior)
                 ->assertSuccessful();
 
@@ -254,7 +254,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             File::shouldReceive('exists')->andReturn(false);
 
             // ACT
-            $this->runOmakaseWithOptions(['--files' => true])
+            $this->runBuffetWithOptions(['--files' => true])
                 ->expectsOutputToContain('Copying files')
                 ->assertSuccessful();
 
@@ -273,7 +273,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             Process::fake(['*' => Process::result('', 'Package not found', 1)]);
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true, '--skip-composer-json' => true])
+            $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true])
                 ->expectsOutputToContain('Installing Composer Packages')
                 ->assertFailed();
 
@@ -286,7 +286,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             Process::fake(['*' => Process::result('', 'npm package not found', 1)]);
 
             // ACT
-            $this->runOmakaseWithOptions(['--npm' => true])
+            $this->runBuffetWithOptions(['--npm' => true])
                 ->expectsOutputToContain('Installing NPM Packages')
                 ->assertFailed();
 
@@ -310,7 +310,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             ]);
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true, '--skip-composer-json' => true, '--force' => true])
+            $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true, '--force' => true])
                 ->expectsOutputToContain('Post-dist command failed but continuing...')
                 ->assertSuccessful();
 
@@ -326,7 +326,7 @@ describe('OmakaseCommand Integration Tests', function (): void {
             ]);
 
             // ACT
-            $this->runOmakaseWithOptions(['--composer' => true, '--skip-composer-json' => true, '--force' => true])
+            $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true, '--force' => true])
                 ->assertSuccessful();
 
             // ASSERT
