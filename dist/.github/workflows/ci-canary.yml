@@ -16,6 +16,9 @@ jobs:
 
       - name: Setup PHP and Composer
         uses: ./.github/actions/setup-php-composer
+        with:
+          flux-username: ${{ secrets.FLUX_USERNAME }}
+          flux-license-key: ${{ secrets.FLUX_LICENSE_KEY }}
 
       - name: Verify Pint fails on CICanary class
         run: |
