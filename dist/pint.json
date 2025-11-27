@@ -1,4 +1,4 @@
 {
     "preset": "laravel",
-    "exclude": ["tests/CICanary.php"]
+    "notName": ["CICanary.php"]
 }
