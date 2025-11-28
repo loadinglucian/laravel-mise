@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use Bigpixelrocket\LaravelBuffet\BuffetServiceProvider;
-use Bigpixelrocket\LaravelBuffet\Commands\BuffetCommand;
+use Bigpixelrocket\LaravelMise\Commands\MiseCommand;
+use Bigpixelrocket\LaravelMise\MiseServiceProvider;
 use Illuminate\Support\Facades\Artisan;
 
-describe('BuffetServiceProvider Integration Tests', function (): void {
+describe('MiseServiceProvider Integration Tests', function (): void {
     it('is registered as a service provider in the package', function (): void {
         // ARRANGE
-        $expectedProviderClass = BuffetServiceProvider::class;
+        $expectedProviderClass = MiseServiceProvider::class;
 
         // ACT
         $loadedProviders = app()->getLoadedProviders();
@@ -22,12 +22,12 @@ describe('BuffetServiceProvider Integration Tests', function (): void {
             ->and($loadedProviders[$expectedProviderClass])->toBe(true);
     });
 
-    it('registers the BuffetCommand when running in console', function (): void {
+    it('registers the MiseCommand when running in console', function (): void {
         // ARRANGE
-        $expectedCommandName = 'laravel:buffet';
+        $expectedCommandName = 'laravel:mise';
 
         // ACT
-        $provider = new BuffetServiceProvider(app());
+        $provider = new MiseServiceProvider(app());
         $provider->register();
         $provider->boot();
         $registeredCommands = Artisan::all();
@@ -40,6 +40,6 @@ describe('BuffetServiceProvider Integration Tests', function (): void {
             ->and($registeredCommands[$expectedCommandName]);
 
         // Verify the specific command instance is registered
-        expect($registeredCommands[$expectedCommandName])->toBeInstanceOf(BuffetCommand::class);
+        expect($registeredCommands[$expectedCommandName])->toBeInstanceOf(MiseCommand::class);
     });
 });

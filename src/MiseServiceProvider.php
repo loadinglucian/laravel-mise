@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Bigpixelrocket\LaravelBuffet;
+namespace Bigpixelrocket\LaravelMise;
 
-use Bigpixelrocket\LaravelBuffet\Commands\BuffetCommand;
-use Bigpixelrocket\LaravelBuffet\Commands\DbMigrateCommand;
+use Bigpixelrocket\LaravelMise\Commands\DbMigrateCommand;
+use Bigpixelrocket\LaravelMise\Commands\MiseCommand;
 use Illuminate\Support\ServiceProvider;
 
-class BuffetServiceProvider extends ServiceProvider
+class MiseServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
                 DbMigrateCommand::class,
-                BuffetCommand::class,
+                MiseCommand::class,
             ]);
         }
     }
@@ -31,12 +31,12 @@ class BuffetServiceProvider extends ServiceProvider
         // These are not meant to be published/customized by users
         $this->mergeConfigFrom(
             __DIR__.'/../config/composer-packages.php',
-            'laravel-buffet.composer-packages'
+            'laravel-mise.composer-packages'
         );
 
         $this->mergeConfigFrom(
             __DIR__.'/../config/npm-packages.php',
-            'laravel-buffet.npm-packages'
+            'laravel-mise.npm-packages'
         );
     }
 }

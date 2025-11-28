@@ -19,7 +19,7 @@ return [
         ],
     ],
     'require-dev' => [
-        'bigpixelrocket/laravel-buffet:dev-main' => [
+        'bigpixelrocket/laravel-mise:dev-main' => [
             'composer' => [
                 'scripts' => [
                     'changed-php-files' => [

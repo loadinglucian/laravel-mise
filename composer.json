@@ -1,11 +1,11 @@
 {
-    "name": "bigpixelrocket/laravel-buffet",
+    "name": "bigpixelrocket/laravel-mise",
     "description": "An opinionated Laravel package that installs and configures a curated selection of development tools and packages",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Bigpixelrocket\\LaravelBuffet\\": "src/"
+            "Bigpixelrocket\\LaravelMise\\": "src/"
         }
     },
     "authors": [
@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Bigpixelrocket\\LaravelBuffet\\BuffetServiceProvider"
+                "Bigpixelrocket\\LaravelMise\\MiseServiceProvider"
             ]
         }
     },

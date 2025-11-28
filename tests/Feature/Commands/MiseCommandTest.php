@@ -1,20 +1,20 @@
 <?php
 
 //
-// BuffetCommand Feature Tests - End-to-end command behavior
+// MiseCommand Feature Tests - End-to-end command behavior
 // -------------------------------------------------------------------------------
 
 declare(strict_types=1);
 
 namespace Tests\Feature\Commands;
 
-use Bigpixelrocket\LaravelBuffet\Commands\BuffetCommand;
+use Bigpixelrocket\LaravelMise\Commands\MiseCommand;
 use Illuminate\Support\Facades\Process;
-use Tests\Support\BuffetCommandHelpers;
+use Tests\Support\MiseCommandHelpers;
 
-uses(BuffetCommandHelpers::class);
+uses(MiseCommandHelpers::class);
 
-describe('BuffetCommand Feature Tests', function (): void {
+describe('MiseCommand Feature Tests', function (): void {
     beforeEach(function (): void {
         Process::fake();
         $this->setTestPackageConfigs();
@@ -22,11 +22,11 @@ describe('BuffetCommand Feature Tests', function (): void {
 
     it('has correct command signature and defaults', function (): void {
         // ARRANGE
-        $command = new BuffetCommand;
+        $command = new MiseCommand;
         $definition = $command->getDefinition();
 
         // ACT & ASSERT
-        expect($command->getName())->toBe('laravel:buffet')
+        expect($command->getName())->toBe('laravel:mise')
             ->and($definition->getOptions())->toHaveKeys(['composer', 'npm', 'files', 'skip-composer-json', 'force'])
             ->and($definition->getOption('composer')->getDefault())->toBeFalse()
             ->and($definition->getOption('npm')->getDefault())->toBeFalse()
@@ -35,7 +35,7 @@ describe('BuffetCommand Feature Tests', function (): void {
 
     it('installs all packages by default', function (): void {
         // ARRANGE & ACT
-        $this->runBuffetWithOptions(['--skip-composer-json' => true])
+        $this->runMiseWithOptions(['--skip-composer-json' => true])
             ->expectsOutputToContain('Installing Composer Packages')
             ->expectsOutputToContain('Installing NPM Packages')
             ->expectsOutputToContain('Copying files')
@@ -48,7 +48,7 @@ describe('BuffetCommand Feature Tests', function (): void {
 
     it('respects composer-only option', function (): void {
         // ARRANGE & ACT
-        $this->runBuffetWithOptions(['--composer' => true, '--skip-composer-json' => true])
+        $this->runMiseWithOptions(['--composer' => true, '--skip-composer-json' => true])
             ->expectsOutputToContain('Installing Composer Packages')
             ->doesntExpectOutputToContain('Installing NPM Packages')
             ->assertSuccessful();
@@ -60,7 +60,7 @@ describe('BuffetCommand Feature Tests', function (): void {
 
     it('respects npm-only option', function (): void {
         // ARRANGE & ACT
-        $this->runBuffetWithOptions(['--npm' => true])
+        $this->runMiseWithOptions(['--npm' => true])
             ->expectsOutputToContain('Installing NPM Packages')
             ->doesntExpectOutputToContain('Installing Composer Packages')
             ->assertSuccessful();
@@ -72,7 +72,7 @@ describe('BuffetCommand Feature Tests', function (): void {
 
     it('respects files-only option', function (): void {
         // ARRANGE & ACT
-        $this->runBuffetWithOptions(['--files' => true])
+        $this->runMiseWithOptions(['--files' => true])
             ->expectsOutputToContain('Copying files')
             ->doesntExpectOutputToContain('Installing Composer Packages')
             ->doesntExpectOutputToContain('Installing NPM Packages')
