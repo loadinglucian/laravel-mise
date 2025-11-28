@@ -1,14 +1,14 @@
 <?php
 
 //
-// Shared Buffet Command Test Helpers
+// Shared Mise en Place Command Test Helpers
 // -------------------------------------------------------------------------------
 
 declare(strict_types=1);
 
 namespace Tests\Support;
 
-use Bigpixelrocket\LaravelBuffet\Commands\BuffetCommand;
+use Bigpixelrocket\LaravelMise\Commands\MiseCommand;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
@@ -16,18 +16,18 @@ use Illuminate\Support\Facades\Process;
 
 use function Pest\Laravel\artisan;
 
-trait BuffetCommandHelpers
+trait MiseCommandHelpers
 {
     //
     // Command Execution
     // -------------------------------------------------------------------------------
 
     /**
-     * Run buffet command with options
+     * Run mise command with options
      */
-    protected function runBuffetWithOptions(array $options): \Illuminate\Testing\PendingCommand
+    protected function runMiseWithOptions(array $options): \Illuminate\Testing\PendingCommand
     {
-        return artisan(BuffetCommand::class, $options);
+        return artisan(MiseCommand::class, $options);
     }
 
     //
@@ -75,7 +75,7 @@ trait BuffetCommandHelpers
      */
     protected function setTestPackageConfigs(): void
     {
-        Config::set('laravel-buffet.composer-packages', [
+        Config::set('laravel-mise.composer-packages', [
             'require' => [
                 'livewire/livewire' => [
                     'commands' => [
@@ -118,7 +118,7 @@ trait BuffetCommandHelpers
             ],
         ]);
 
-        Config::set('laravel-buffet.npm-packages', [
+        Config::set('laravel-mise.npm-packages', [
             'dependencies' => ['tailwindcss', '@tailwindcss/vite'],
             'devDependencies' => ['prettier', 'prettier-plugin-blade'],
         ]);

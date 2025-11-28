@@ -1,4 +1,4 @@
-# Laravel Buffet
+# Laravel Mise en Place
 
 An opinionated Laravel package that provides a curated selection of packages and configurations for your next Laravel project. This package installs and configures a thoughtfully selected set of development tools and packages.
 
@@ -20,7 +20,7 @@ An opinionated Laravel package that provides a curated selection of packages and
 Install the package via Composer:
 
 ```bash
-composer require --dev bigpixelrocket/laravel-buffet:dev-main
+composer require --dev bigpixelrocket/laravel-mise:dev-main
 ```
 
 The package will automatically register itself via Laravel's package discovery.
@@ -29,10 +29,10 @@ The package will automatically register itself via Laravel's package discovery.
 
 ### Install Everything (Recommended)
 
-Run the buffet command to install all packages and copy all configuration files:
+Run the mise command to install all packages and copy all configuration files:
 
 ```bash
-php artisan laravel:buffet
+php artisan laravel:mise
 ```
 
 The command will automatically configure your `composer.json` file with package-specific settings (like scripts and repositories) when installing certain packages. You'll be prompted to confirm these changes before they're applied.
@@ -43,19 +43,19 @@ You can choose to install only specific parts:
 
 ```bash
 # Install only Composer packages
-php artisan laravel:buffet --composer
+php artisan laravel:mise --composer
 
 # Install only NPM packages
-php artisan laravel:buffet --npm
+php artisan laravel:mise --npm
 
 # Copy only configuration files
-php artisan laravel:buffet --files
+php artisan laravel:mise --files
 
 # Force overwrite existing files when copying
-php artisan laravel:buffet --files --force
+php artisan laravel:mise --files --force
 
 # Skip composer.json modifications entirely
-php artisan laravel:buffet --skip-composer-json
+php artisan laravel:mise --skip-composer-json
 ```
 
 ### Composer.json Configuration
@@ -138,7 +138,7 @@ The package copies the following configuration files to your project:
 
 ## Command Options
 
-### laravel:buffet Command
+### laravel:mise Command
 
 | Option                 | Description                                               |
 | ---------------------- | --------------------------------------------------------- |

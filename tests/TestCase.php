@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Bigpixelrocket\LaravelBuffet\BuffetServiceProvider;
+use Bigpixelrocket\LaravelMise\MiseServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
@@ -16,7 +16,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            BuffetServiceProvider::class,
+            MiseServiceProvider::class,
         ];
     }
 
