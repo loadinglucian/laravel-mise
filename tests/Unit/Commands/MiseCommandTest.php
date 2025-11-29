@@ -26,7 +26,9 @@ describe('MiseCommand Unit Tests', function (): void {
 
             expect($definition->getOption('composer')->getDefault())->toBeFalse()
                 ->and($definition->getOption('npm')->getDefault())->toBeFalse()
-                ->and($definition->getOption('files')->getDefault())->toBeFalse();
+                ->and($definition->getOption('files')->getDefault())->toBeFalse()
+                ->and($definition->getOption('skip-composer-json')->getDefault())->toBeFalse()
+                ->and($definition->getOption('force')->getDefault())->toBeFalse();
         });
     });
 });
