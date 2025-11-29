@@ -1,0 +1,215 @@
+---
+alwaysApply: true
+---
+
+## Laravel Artisan Rules
+
+All rules MANDATORY. Fix violating code, not these rules.
+
+### Output Method Philosophy
+
+Use Laravel's built-in Artisan command methods for consistent output styling.
+
+All console output flows through Laravel's Command class methods for consistent TUI styling.
+
+**Built-in Output Methods:**
+
+```php
+// Output
+$this->line('Plain text output');
+$this->newLine(2);
+
+// Status messages
+$this->info('Configuration loaded');       // Green text
+$this->error('Operation failed');          // Red text
+$this->warn('Skipping step');              // Yellow text
+$this->comment('Additional note');         // Gray text
+
+// Structured output
+$this->table(['Name', 'Status'], $rows);
+$this->withProgressBar($items, fn ($item) => $this->process($item));
+```
+
+**Missing a method?** Add to BaseCommand trait with modern styling.
+
+**Integration Points:**
+
+- Base: Illuminate\Console\Command (extended)
+- Custom traits for shared functionality
+- Methods: `line()`, `info()`, `error()`, `warn()`, `comment()`, `table()`, `ask()`, `secret()`, `confirm()`, `choice()`, `anticipate()`
+
+**Trait Organization:**
+
+- ConsoleOutputTrait: Custom output/formatting methods
+- ConsoleInputTrait: Custom input methods using Laravel Prompts
+- BaseCommand: Shared initialization, configuration, orchestration (NOT individual I/O ops)
+
+### User Input with Laravel Prompts
+
+Use `laravel/prompts` for ALL user interactions:
+
+```php
+use function Laravel\Prompts\{text, password, confirm, select, multiselect, suggest, search, spin};
+
+$name = text('What is your name?', required: true);
+$password = password('Enter password:', required: true);
+$confirmed = confirm('Deploy?', default: false);
+$env = select('Environment:', ['dev', 'staging', 'prod']);
+$features = multiselect('Features:', ['cache', 'queue', 'logs']);
+$result = spin(fn() => $this->service->process(), 'Processing...');
+```
+
+Commands handle ALL user interaction. Services return plain data with NO console operations.
+
+### Interactive + Options Pattern
+
+Support both interactive prompts AND CLI options.
+
+**Pattern:**
+
+```php
+protected $signature = 'tool:install
+    {--name= : Tool name}
+    {--ver= : Version to install}
+    {--y|yes : Skip confirmation}';
+
+public function handle(): int
+{
+    // Checks CLI option first, prompts if not provided
+    $name = $this->option('name') ?? text(
+        label: 'Tool name:',
+        placeholder: 'redis',
+        required: true
+    );
+
+    $version = $this->option('ver') ?? text(
+        label: 'Version:',
+        placeholder: 'latest',
+        required: true
+    );
+
+    $skipConfirm = $this->option('yes') || confirm(
+        label: 'Skip verification?',
+        default: false
+    );
+
+    // ... process command ...
+
+    return self::SUCCESS;
+}
+```
+
+**Pattern:** Check option first, fall back to Laravel Prompts function if not provided.
+
+### Input Validation Pattern
+
+Validation traits provide reusable validation for both Laravel Prompts and CLI options.
+
+**Validation Method Pattern:**
+
+```php
+// ✅ CORRECT - Accept mixed, return ?string (error message or null)
+protected function validateNameInput(mixed $name): ?string
+{
+    if (!is_string($name)) {
+        return 'Tool name must be a string';
+    }
+
+    if ('' === trim($name)) {
+        return 'Tool name cannot be empty';
+    }
+
+    if (null !== $this->tools->findByName($name)) {
+        return "Tool '{$name}' is already installed";
+    }
+
+    return null;
+}
+
+// ❌ WRONG - Throws exception (incompatible with Laravel Prompts)
+protected function validateName(string $name): void
+{
+    if ('' === trim($name)) {
+        throw new \InvalidArgumentException('Name cannot be empty');
+    }
+}
+```
+
+**Usage with Laravel Prompts:**
+
+```php
+$name = $this->option('name') ?? text(
+    label: 'Tool name:',
+    placeholder: 'redis',
+    validate: fn ($value) => $this->validateNameInput($value)
+);
+```
+
+Laravel Prompts' `validate` callback returns `?string` - null means valid, string is error message.
+
+**Naming Convention:**
+
+- `validate*Input()` - Returns `?string` (for prompts/options)
+- `validate*()` - Throws exceptions (for heavy I/O like git repo checks)
+
+**Testing Validation Traits:**
+
+```php
+class TestValidator { use ToolValidationTrait;
+    public function testValidateVersion(mixed $ver): ?string {
+        return $this->validateVersionInput($ver);
+    }
+}
+
+expect($validator->testValidateVersion('1.0.0'))->toBeNull();
+expect($validator->testValidateVersion('invalid'))->toContain('valid');
+```
+
+### Command Options & Input
+
+**Naming Convention Rules:**
+
+| Option           | Usage                    | Signature Syntax | When                 |
+| ---------------- | ------------------------ | ---------------- | -------------------- |
+| `--tool`         | Select existing tool     | `{--tool=}`      | remove, info, update |
+| `--env`          | Select environment       | `{--env=}`       | config operations    |
+| `--name`         | Define new resource name | `{--name=}`      | add, create          |
+| `--ver`          | Version string           | `{--ver=}`       | tool config          |
+| `--path`         | File/Dir path            | `{--path=}`      | config               |
+| `--yes` / `-y`   | Skip confirmation        | `{--y\|yes}`     | all confirmations    |
+| `--force` / `-f` | Skip type-to-confirm     | `{--f\|force}`   | remove commands      |
+| `--skip`         | Skip validation          | `{--skip}`       | validation steps     |
+
+**Golden Rule:**
+
+- `--tool` / `--env`: SELECTING existing (operation target)
+- `--name`: DEFINING new resource property
+
+Prevents conflicts in commands working with multiple resource types.
+
+**Additional Rules:**
+
+- Use OPTIONS only, never ARGUMENTS (enables option-or-prompt pattern)
+- Boolean flags: `{--flag}` (no `=`)
+- Data inputs: `{--option=}` (with `=`)
+- Only `--yes` (`-y`) and `--force` (`-f`) get short flags: `{--y|yes}`
+
+### Command Completion
+
+Consider showing a non-interactive command replay to teach CLI usage:
+
+```php
+$this->comment("Run non-interactively:");
+$this->line("  php artisan tool:remove --tool='{$name}' --yes");
+
+return self::SUCCESS;
+```
+
+Teaches CLI syntax, improves DX, reduces support questions.
+
+**Output:**
+
+```
+Run non-interactively:
+  php artisan tool:remove --tool='redis' --yes
+```
