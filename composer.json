@@ -1,6 +1,6 @@
 {
     "name": "bigpixelrocket/laravel-mise",
-    "description": "An opinionated Laravel package that installs and configures a curated selection of development tools and packages",
+    "description": "A Laravel package that provides a curated selection of packages and configurations",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -15,8 +15,8 @@
         }
     ],
     "require": {
-        "php": "^8.4",
-        "laravel/framework": "^12.24"
+        "php": "^8.5",
+        "laravel/framework": "^12.40"
     },
     "extra": {
         "laravel": {
@@ -26,13 +26,13 @@
         }
     },
     "require-dev": {
-        "laravel/pint": "^1.24",
-        "larastan/larastan": "^3.6",
+        "laravel/pint": "^1.26",
+        "larastan/larastan": "^3.8",
         "barryvdh/laravel-ide-helper": "^3.6",
-        "pestphp/pest": "^3.8",
-        "orchestra/testbench": "^10.4",
-        "pestphp/pest-plugin-laravel": "^3.2",
-        "rector/rector": "^2.1",
+        "pestphp/pest": "^4.1",
+        "orchestra/testbench": "^10.8",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "rector/rector": "^2.2",
         "roave/security-advisories": "dev-latest"
     },
     "config": {

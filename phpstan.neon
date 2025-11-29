@@ -5,11 +5,11 @@ includes:
 parameters:
     paths:
         - config/
-        - dist/
+        - payload/
         - src/
 
     excludePaths:
-        - dist/tests/
+        - payload/tests/
         - tests/
 
     # Level 10 is the highest level

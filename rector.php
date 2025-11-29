@@ -12,12 +12,12 @@ return RectorConfig::configure()
     )
     ->withPaths([
         __DIR__.'/config',
-        __DIR__.'/dist',
+        __DIR__.'/payload',
         __DIR__.'/src',
         __DIR__.'/tests',
     ])
     ->withPhpSets()
     ->withSkip([
-        __DIR__.'/dist/tests/CICanary.php',
+        __DIR__.'/payload/tests/CICanary.php',
         __DIR__.'/tests/CICanary.php',
     ]);

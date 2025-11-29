@@ -13,14 +13,6 @@ declare(strict_types=1);
 // and lightweight helper functions.
 
 //
-// Global Test Configuration
-// -------------------------------------------------------------------------------
-
-beforeEach(function (): void {
-    $this->timeout(10);
-});
-
-//
 // Test Case Binding
 // -------------------------------------------------------------------------------
 uses(Tests\TestCase::class)

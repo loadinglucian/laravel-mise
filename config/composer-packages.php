@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'require' => [
         'livewire/livewire' => [
@@ -8,7 +10,7 @@ return [
             ],
         ],
         'livewire/flux' => [
-            'post_dist_commands' => [
+            'post_payload_commands' => [
                 ['php', 'artisan', 'flux:activate'],
             ],
         ],
@@ -71,17 +73,17 @@ return [
         'beyondcode/laravel-query-detector' => [
         ],
         'rector/rector' => [
-            'post_dist_commands' => [
+            'post_payload_commands' => [
                 ['vendor/bin/rector'],
             ],
         ],
         'laravel/pint' => [
-            'post_dist_commands' => [
+            'post_payload_commands' => [
                 ['vendor/bin/pint', '--repair'],
             ],
         ],
         'larastan/larastan' => [
-            'post_dist_commands' => [
+            'post_payload_commands' => [
                 ['vendor/bin/phpstan', 'analyse'],
             ],
         ],

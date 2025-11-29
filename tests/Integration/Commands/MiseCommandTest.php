@@ -81,7 +81,7 @@ describe('MiseCommand Integration Tests', function (): void {
             });
         });
 
-        it('executes post-dist commands after installation', function (): void {
+        it('executes post-payload commands after installation', function (): void {
             // ARRANGE & ACT
             $this->runMiseWithOptions(['--composer' => true, '--skip-composer-json' => true])
                 ->assertSuccessful();
@@ -92,7 +92,7 @@ describe('MiseCommand Integration Tests', function (): void {
             $this->assertCommandRan('php artisan flux:activate');
         });
 
-        it('handles post-dist command failures gracefully', function (): void {
+        it('handles post-payload command failures gracefully', function (): void {
             // ARRANGE
             Process::fake([
                 '*' => function (PendingProcess $process) {
@@ -107,7 +107,7 @@ describe('MiseCommand Integration Tests', function (): void {
 
             // ACT
             $this->runMiseWithOptions(['--composer' => true, '--skip-composer-json' => true])
-                ->expectsOutputToContain('Post-dist command failed but continuing...')
+                ->expectsOutputToContain('Post-payload command failed but continuing...')
                 ->assertSuccessful();
 
             // ASSERT
@@ -294,7 +294,7 @@ describe('MiseCommand Integration Tests', function (): void {
             $this->assertCommandRan('npm update');
         });
 
-        it('continues on post-dist command failures', function (): void {
+        it('continues on post-payload command failures', function (): void {
             // ARRANGE
             Process::fake([
                 '*' => function (PendingProcess $process) {
@@ -311,7 +311,7 @@ describe('MiseCommand Integration Tests', function (): void {
 
             // ACT
             $this->runMiseWithOptions(['--composer' => true, '--skip-composer-json' => true, '--force' => true])
-                ->expectsOutputToContain('Post-dist command failed but continuing...')
+                ->expectsOutputToContain('Post-payload command failed but continuing...')
                 ->assertSuccessful();
 
             // ASSERT

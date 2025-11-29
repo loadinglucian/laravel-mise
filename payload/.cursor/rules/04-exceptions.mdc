@@ -1,0 +1,99 @@
+---
+alwaysApply: true
+---
+
+## Exception Handling & Error Display
+
+All rules MANDATORY.
+
+### Core Principle
+
+Services throw complete, user-facing exceptions. Interface layer (Livewire/Controllers/Commands) displays them or flashes them to session.
+
+### Services & Repositories
+
+Throw `\RuntimeException` with complete, actionable messages:
+
+```php
+// ✅ CORRECT - Complete message with context
+throw new \RuntimeException("Config file does not exist: {$configPath}");
+throw new \RuntimeException("User '{$id}' not found");
+
+// ✅ CORRECT - Preserve exception chain when wrapping
+} catch (\Throwable $e) {
+    throw new \RuntimeException(
+        "Operation failed for {$name}. Check logs for details.",
+        previous: $e
+    );
+}
+
+// ❌ WRONG - Fragment requiring concatenation
+throw new \RuntimeException("does not exist");
+
+// ❌ WRONG - Generic prefix causing concatenation
+} catch (\Throwable $e) {
+    throw new \RuntimeException("Failed to execute: " . $e->getMessage());
+}
+```
+
+**Rules:**
+
+- Messages must be user-facing and complete (not fragments)
+- Include relevant context (paths, names, IDs, versions)
+- Use `previous: $e` to preserve exception chains for debugging
+- Never catch and re-throw with generic prefixes like "Failed to..."
+
+### Validation
+
+**Pattern A: Input Validation (Forms/Prompts)**
+
+Returns `?string` or throws ValidationException:
+
+```php
+// In Livewire/Controllers, use Laravel Validation
+$this->validate([
+    'name' => 'required|string|min:3',
+]);
+```
+
+**Pattern B: Logic Validation**
+
+Throws `\RuntimeException` or Domain Exception:
+
+```php
+if ($this->balance < $amount) {
+    throw new \RuntimeException("Insufficient funds for transaction.");
+}
+```
+
+### Interface Layer Responsibility
+
+**Livewire/Controllers:**
+
+- Catch exceptions from Services
+- Flash error message to session or add error to bag
+- Do NOT leak implementation details to user
+
+```php
+// ✅ CORRECT - Livewire/Controller
+try {
+    $this->service->performAction();
+} catch (\RuntimeException $e) {
+    $this->addError('action', $e->getMessage());
+    return;
+}
+```
+
+**Commands:**
+
+- Catch exceptions, display directly using `$this->error()`
+- Return status code
+
+### Exception Message Quality
+
+Every exception message must be:
+
+- Complete (not: "does not exist", but: "File does not exist: /path/to/file")
+- User-facing (not: "PDO error 2002", but: "Cannot connect to database.")
+- Actionable with context
+- Free of redundant prefixes
