@@ -18,7 +18,7 @@ describe('MiseCommand Unit Tests', function (): void {
                 'require' => [
                     'package/name' => [
                         'commands' => [['php', 'artisan', 'command']],
-                        'post_dist_commands' => [['vendor/bin/tool']],
+                        'post_payload_commands' => [['vendor/bin/tool']],
                     ],
                 ],
                 'require-dev' => [
@@ -34,7 +34,7 @@ describe('MiseCommand Unit Tests', function (): void {
                 ->and(config('laravel-mise.composer-packages.require'))
                 ->toHaveKey('package/name')
                 ->and(config('laravel-mise.composer-packages.require.package/name'))
-                ->toHaveKeys(['commands', 'post_dist_commands']);
+                ->toHaveKeys(['commands', 'post_payload_commands']);
         });
 
         it('validates npm package configuration structure', function (): void {
@@ -82,7 +82,7 @@ describe('MiseCommand Unit Tests', function (): void {
                     'simple/package',
                     'complex/package' => [
                         'commands' => [['php', 'artisan', 'command']],
-                        'post_dist_commands' => [['vendor/bin/tool']],
+                        'post_payload_commands' => [['vendor/bin/tool']],
                     ],
                 ],
             ];
@@ -99,7 +99,7 @@ describe('MiseCommand Unit Tests', function (): void {
             expect(config('laravel-mise.composer-packages.require'))
                 ->toContain('simple/package')
                 ->and(config('laravel-mise.composer-packages.require.complex/package'))
-                ->toHaveKeys(['commands', 'post_dist_commands'])
+                ->toHaveKeys(['commands', 'post_payload_commands'])
                 ->and(config('laravel-mise.npm-packages.dependencies'))
                 ->toContain('react', 'vue')
                 ->and(config('laravel-mise.npm-packages.devDependencies'))

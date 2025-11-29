@@ -32,11 +32,11 @@ class MiseCommand extends Command
     protected $description = 'An opinionated Laravel menu';
 
     //
-    // Post-Distribution Commands Collection
+    // Post-Payload Commands Collection
     // -------------------------------------------------------------------------------
 
     /** @var array<array<string>> */
-    protected array $postDistCommands = [];
+    protected array $postPayloadCommands = [];
 
     //
     // Main Entry Point
@@ -129,16 +129,16 @@ class MiseCommand extends Command
         }
 
         //
-        // Post-Distribution Commands
+        // Post-Payload Commands
 
-        if (! empty($this->postDistCommands)) {
+        if (! empty($this->postPayloadCommands)) {
             $this->newLine();
             $this->line('╔═══════════════════════════════════════════╗');
             $this->line('║        Run the following commands?        ║');
             $this->line('╚═══════════════════════════════════════════╝');
             $this->newLine();
 
-            $this->execPostDistCommands($this->postDistCommands);
+            $this->execPostPayloadCommands($this->postPayloadCommands);
         }
 
         return self::SUCCESS;
@@ -172,8 +172,8 @@ class MiseCommand extends Command
                     if (isset($v['commands'])) {
                         $commands = [...$commands, ...$v['commands']];
                     }
-                    if (isset($v['post_dist_commands'])) {
-                        $this->postDistCommands = [...$this->postDistCommands, ...$v['post_dist_commands']];
+                    if (isset($v['post_payload_commands'])) {
+                        $this->postPayloadCommands = [...$this->postPayloadCommands, ...$v['post_payload_commands']];
                     }
                 }
             }
@@ -239,21 +239,21 @@ class MiseCommand extends Command
     }
 
     /**
-     * Execute post-distribution commands that don't fail the installation
+     * Execute post-payload commands that don't fail the installation
      *
      * @param  array<array<string>>  $commands
      */
-    protected function execPostDistCommands(array $commands): void
+    protected function execPostPayloadCommands(array $commands): void
     {
         if (empty($commands)) {
             return;
         }
 
-        $this->comment('Executing all post-dist commands...');
+        $this->comment('Executing all post-payload commands...');
         foreach ($commands as $command) {
             $this->warn(implode(' ', $command));
             if (! $this->exec($command, optional: true)) {
-                $this->comment('Post-dist command failed but continuing...');
+                $this->comment('Post-payload command failed but continuing...');
             }
         }
     }
@@ -299,14 +299,14 @@ class MiseCommand extends Command
     // -------------------------------------------------------------------------------
 
     /**
-     * Copy all files from the dist directory to the project
+     * Copy all files from the payload directory to the project
      */
     protected function copyFiles(): bool
     {
-        $basePath = __DIR__.'/../../dist/';
+        $basePath = __DIR__.'/../../payload/';
 
         /** @var array<int, string> $files */
-        $files = $this->getDistFiles($basePath);
+        $files = $this->getPayloadFiles($basePath);
 
         try {
             foreach ($files as $filePathname) {
@@ -333,14 +333,14 @@ class MiseCommand extends Command
     }
 
     /**
-     * Get all files from the dist directory recursively
+     * Get all files from the payload directory recursively
      *
      * @return array<int, string>
      */
-    protected function getDistFiles(string $basePath): array
+    protected function getPayloadFiles(string $basePath): array
     {
-        /** @var \RecursiveIteratorIterator<\RecursiveDirectoryIterator> $distFiles */
-        $distFiles = new \RecursiveIteratorIterator(
+        /** @var \RecursiveIteratorIterator<\RecursiveDirectoryIterator> $payloadFiles */
+        $payloadFiles = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator(
                 $basePath,
                 \RecursiveDirectoryIterator::SKIP_DOTS
@@ -353,7 +353,7 @@ class MiseCommand extends Command
                 /** @var \SplFileInfo $file */
                 return $file->getPathname();
             },
-            iterator_to_array($distFiles)
+            iterator_to_array($payloadFiles)
         );
 
         sort($files);

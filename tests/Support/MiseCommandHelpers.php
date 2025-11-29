@@ -83,7 +83,7 @@ trait MiseCommandHelpers
                     ],
                 ],
                 'livewire/flux' => [
-                    'post_dist_commands' => [
+                    'post_payload_commands' => [
                         ['php', 'artisan', 'flux:activate'],
                     ],
                 ],
@@ -105,12 +105,12 @@ trait MiseCommandHelpers
                     ],
                 ],
                 'rector/rector' => [
-                    'post_dist_commands' => [
+                    'post_payload_commands' => [
                         ['vendor/bin/rector'],
                     ],
                 ],
                 'laravel/pint' => [
-                    'post_dist_commands' => [
+                    'post_payload_commands' => [
                         ['vendor/bin/pint', '--repair'],
                     ],
                 ],
