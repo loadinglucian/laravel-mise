@@ -1,0 +1,84 @@
+---
+alwaysApply: true
+---
+
+## Livewire Rules
+
+All rules MANDATORY.
+
+### Component Structure
+
+Use standard class-based Livewire components.
+
+**Properties:**
+
+- Use `public` properties for data binding
+- Use `protected` properties for internal state
+- Type all properties
+
+**Mounting:**
+
+- Keep `mount()` lightweight
+- Initialize complex data only when needed
+
+```php
+class CreateUser extends Component
+{
+    public string $name = '';
+    public string $email = '';
+
+    public function save(UserService $service): void
+    {
+        $this->validate();
+
+        $service->create($this->name, $this->email);
+
+        $this->dispatch('user-created');
+        $this->reset();
+    }
+
+    public function render(): View
+    {
+        return view('livewire.create-user');
+    }
+}
+```
+
+### Validation
+
+- Define `$rules` property or `rules()` method
+- Use `$this->validate()` before actions
+
+### Blade & Frontend
+
+- Use Alpine.js for client-side interactivity
+- Use `@entangle` to share state between Livewire and Alpine
+- Use `wire:loading` for visual feedback
+
+```html
+<!-- ✅ CORRECT -->
+<button wire:click="save" wire:loading.attr="disabled">
+    <span wire:loading.remove>Save</span>
+    <span wire:loading>Saving...</span>
+</button>
+```
+
+### Computed Properties
+
+Use `#[Computed]` attribute for expensive queries or derived state.
+
+```php
+use Livewire\Attributes\Computed;
+
+#[Computed]
+public function posts()
+{
+    return Post::where('user_id', $this->userId)->get();
+}
+```
+
+### Optimization
+
+- Use `wire:navigate` for SPA-like transitions
+- Use `lazy` loading for heavy components: `<livewire:heavy-component lazy />`
+- Avoid passing large objects (Models) to public properties if not needed (use IDs)

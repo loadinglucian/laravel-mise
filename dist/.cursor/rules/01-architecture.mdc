@@ -1,0 +1,174 @@
+---
+alwaysApply: true
+---
+
+## Architecture Rules
+
+All rules MANDATORY.
+
+### PHP Standards
+
+- PSR-12, strict types and modern PHP
+- Explicit return types with generics: `Collection<int, User>`
+- Dependency injection via Laravel's Service Container
+- Use Laravel classes over native PHP functions (Filesystem, Process) for testability
+- **Yoda conditions:** Always place constants on the left side of comparisons to prevent accidental assignment
+
+### Modern PHP (8.5+)
+
+**Properties:**
+
+- `readonly` properties and classes for immutability
+- Property hooks over getter/setter boilerplate
+- Asymmetric visibility: `public private(set) string $id`
+- Clone with: `clone $obj with { prop: 'value' }`
+
+```php
+readonly class UserDTO {
+    public string $email {
+        set => strtolower(trim($value));
+    }
+    public private(set) string $id;
+}
+```
+
+**Types:**
+
+- Enums over class constants for finite values
+- Intersection types: `Countable&Iterator`
+- DNF types: `(A&B)|null`
+- Typed class constants: `public const string NAME = 'foo'`
+- Standalone types: `true`, `false`, `null`
+
+**Syntax:**
+
+- `match` over `switch` for value returns
+- First-class callables: `$fn = $this->method(...)`
+- `new` in initializers: `function foo(Log $log = new NullLog())`
+- `new` chaining: `new Foo()->method()`
+- Pipe operator: `$val |> trim(...) |> strtoupper(...)`
+- Dynamic constant fetch: `MyClass::{$name}`
+
+**Attributes:**
+
+- `#[\Override]` on all overridden methods
+- `#[\Deprecated]` for deprecation warnings
+- `#[\NoDiscard]` when return value must be used
+- `#[\SensitiveParameter]` to redact from stack traces
+
+**Functions:**
+
+- `array_find()`, `array_any()`, `array_all()` over manual loops
+- `array_first()`, `array_last()` for element access
+- `mb_ucfirst()`, `mb_lcfirst()`, `mb_trim()` for multibyte
+- `json_validate()` before decode when validation-only
+
+### PHPStan Type Hints
+
+Use `@var` annotations to help PHPStan understand types it cannot infer, not `assert()` in production code.
+
+```php
+// ✅ CORRECT - @var annotation (zero runtime impact)
+/** @var string $apiToken */
+$apiToken = $this->env->get(['API_TOKEN']);
+
+// ❌ WRONG - assert() in production code (runtime cost, can be disabled)
+$apiToken = $this->env->get(['API_TOKEN']);
+assert(is_string($apiToken));
+```
+
+### Imports
+
+Always add `use` statements for vendor packages and project classes. Root namespace FQDNs acceptable (`\InvalidArgumentException`, `\RuntimeException`).
+
+```php
+// ✅ CORRECT
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Storage;
+
+$fs = new Filesystem();
+throw new \InvalidArgumentException('Error');
+
+// ❌ WRONG - inline FQDNs for non-root namespaces
+$fs = new \Illuminate\Filesystem\Filesystem();
+```
+
+### Dependency Injection System
+
+Use Laravel's Service Container via `app()` helper or constructor injection. Container uses reflection to auto-wire dependencies.
+
+```php
+// ✅ CORRECT - Constructor injection (preferred)
+public function __construct(private readonly MyService $service) {}
+
+// ✅ CORRECT - Resolve from container
+$service = app(MyService::class);
+
+// ❌ WRONG - Manual instantiation
+$service = new MyService(new Dependency());
+```
+
+**Rule:** ALL object creation uses constructor injection or `app()` except DTOs, value objects, pure data structures.
+
+### Layer Separation
+
+**Interface Layer (Livewire / Controllers / Commands):**
+
+- Handle user interaction (input/output), orchestrate Services
+- NO business logic (delegate to Services)
+- Responsible for validation, authorization, response formatting
+- Livewire: Component logic in Class, View logic in Blade
+
+**Service Layer:**
+
+- Atomic, reusable functionality
+- Accept/return plain PHP data types (DTOs, Models)
+- Dependency-injected via constructor
+- Handle business logic, external APIs, file operations
+
+**Service State:**
+
+- Stateless: Pure operations, no internal state (validators, calculators, API clients)
+- Stateful: Manage configuration/cached data (config loaders, file managers)
+
+**Dependencies:**
+
+- Interface depends on Services
+- Services depend on Services/utilities
+- All dependencies in constructor signatures
+- NO circular dependencies
+
+### Comments
+
+**DocBlock:** Minimalist descriptions, parameters, return types for classes and functions.
+
+**Comment structure:**
+
+```
+// ----
+// {h1}
+// ----
+
+//
+// {h2}
+// ----
+
+//
+// {h3}
+
+// {p}
+```
+
+Separate sections visually. One newline between headers/subheaders/paragraphs. No obvious comments. Remove comments when removing code.
+
+### Quality Gates
+
+ALWAYS run before completing task, fix all issues:
+
+```bash
+vendor/bin/rector $CHANGED_PHP_FILES   # Code improvements
+vendor/bin/pint $CHANGED_PHP_FILES     # Fix style
+vendor/bin/phpstan analyze $CHANGED_PHP_FILES_EXCEPT_TESTS  # NEVER run on tests/
+```
+
+PHPStan excluded from tests - tests focus on functionality over type compliance.
