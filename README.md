@@ -12,8 +12,8 @@ A Laravel package that provides a curated selection of packages and configuratio
 
 ## Requirements
 
-- PHP ^8.4
-- Laravel ^12.19
+- PHP ^8.5
+- Laravel ^12.40
 
 ## Installation
 
