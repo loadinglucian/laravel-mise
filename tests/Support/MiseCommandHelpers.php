@@ -2,7 +2,7 @@
 
 //
 // Shared Mise en Place Command Test Helpers
-// -------------------------------------------------------------------------------
+// ----
 
 declare(strict_types=1);
 
@@ -20,7 +20,7 @@ trait MiseCommandHelpers
 {
     //
     // Command Execution
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Run mise command with options
@@ -32,7 +32,7 @@ trait MiseCommandHelpers
 
     //
     // Process Assertions
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Extract command string from PendingProcess for assertions
@@ -68,7 +68,7 @@ trait MiseCommandHelpers
 
     //
     // Test Data Setup
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Set test package configurations
@@ -126,7 +126,7 @@ trait MiseCommandHelpers
 
     //
     // Mocking Helpers (for Feature Tests)
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Mock composer.json file with content

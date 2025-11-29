@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-// -------------------------------------------------------------------------------
+// ----
 //
 // Pest Configuration and Test Utilities
 //
-// -------------------------------------------------------------------------------
+// ----
 //
 // Centralized Pest setup and shared helpers used across the test suite.
 // Keep this file focused on global configuration, custom expectations,
@@ -14,13 +14,13 @@ declare(strict_types=1);
 
 //
 // Test Case Binding
-// -------------------------------------------------------------------------------
+// ----
 uses(Tests\TestCase::class)
     ->in('Arch', 'Feature', 'Unit');
 
 //
 // Test Helpers
-// -------------------------------------------------------------------------------
+// ----
 
 /**
  * Create a temporary directory with automatic cleanup tracking.
