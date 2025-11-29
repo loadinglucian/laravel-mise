@@ -51,4 +51,4 @@ Build Laravel Mise en Place: a Laravel package that provides a selection of conf
 
 Don't run or create or update tests UNLESS explicitly instructed to do so.
 
-Test are something we will focus on separately from building features.
+Tests are something we will focus on separately from building features.
