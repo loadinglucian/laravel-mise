@@ -1,6 +1,6 @@
 {
     "name": "bigpixelrocket/laravel-mise",
-    "description": "An opinionated Laravel package that installs and configures a curated selection of development tools and packages",
+    "description": "A Laravel package that provides a curated selection of packages and configurations",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": "^8.4",
+        "php": "^8.5",
         "laravel/framework": "^12.24"
     },
     "extra": {

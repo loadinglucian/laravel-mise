@@ -1,6 +1,6 @@
 # Laravel Mise en Place
 
-An opinionated Laravel package that provides a curated selection of packages and configurations for your next Laravel project. This package installs and configures a thoughtfully selected set of development tools and packages.
+A Laravel package that provides a curated selection of packages and configurations for your next Laravel project. This package installs and configures a thoughtfully selected set of development tools and packages.
 
 ## Features
 
