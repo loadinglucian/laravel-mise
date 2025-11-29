@@ -35,4 +35,3 @@ describe('MiseServiceProvider Feature Tests', function (): void {
             ->getName()->toBe('laravel:mise');
     });
 });
-

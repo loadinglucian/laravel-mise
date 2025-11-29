@@ -14,7 +14,7 @@ describe('MiseCommand Unit Tests', function (): void {
 
             expect($command->getName())->toBe('laravel:mise')
                 ->and($definition->getOptions())->toHaveKeys([
-                    'composer', 'npm', 'files', 'skip-composer-json', 'force'
+                    'composer', 'npm', 'files', 'skip-composer-json', 'force',
                 ]);
         });
     });
@@ -30,4 +30,3 @@ describe('MiseCommand Unit Tests', function (): void {
         });
     });
 });
-
