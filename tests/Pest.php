@@ -16,12 +16,7 @@ declare(strict_types=1);
 // Test Case Binding
 // -------------------------------------------------------------------------------
 uses(Tests\TestCase::class)
-    ->in('Arch', 'Feature', 'Integration', 'Unit');
-
-//
-// Custom Expectations
-// -------------------------------------------------------------------------------
-expect()->extend('toBeOne', fn ($value) => expect($value)->toBe(1));
+    ->in('Arch', 'Feature', 'Unit');
 
 //
 // Test Helpers
@@ -41,7 +36,7 @@ function createTempDirectory(string $prefix = 'laravel_mise_test_'): string
 /**
  * Set application base path temporarily with automatic restoration.
  */
-function withTemporaryBasePath(string $tempPath, callable $callback)
+function withTemporaryBasePath(string $tempPath, callable $callback): mixed
 {
     $app = app();
     $original = $app->basePath();
@@ -53,14 +48,4 @@ function withTemporaryBasePath(string $tempPath, callable $callback)
     } finally {
         $app->setBasePath($original);
     }
-}
-
-/**
- * Convert the command of a PendingProcess (string|array) to a readable string.
- */
-function commandToString(\Illuminate\Process\PendingProcess $process): string
-{
-    return is_array($process->command)
-        ? implode(' ', $process->command)
-        : $process->command;
 }

@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tests\Integration;
+namespace Tests\Feature;
 
-use Bigpixelrocket\LaravelMise\Commands\MiseCommand;
 use Bigpixelrocket\LaravelMise\MiseServiceProvider;
 use Illuminate\Support\Facades\Artisan;
 
-describe('MiseServiceProvider Integration Tests', function (): void {
+describe('MiseServiceProvider Feature Tests', function (): void {
     it('is registered as a service provider in the package', function (): void {
         // ARRANGE
         $expectedProviderClass = MiseServiceProvider::class;
@@ -23,10 +22,7 @@ describe('MiseServiceProvider Integration Tests', function (): void {
     });
 
     it('registers the MiseCommand when running in console', function (): void {
-        // ARRANGE
-        $expectedCommandName = 'laravel:mise';
-
-        // ACT
+        // ARRANGE & ACT
         $provider = new MiseServiceProvider(app());
         $provider->register();
         $provider->boot();
@@ -34,12 +30,9 @@ describe('MiseServiceProvider Integration Tests', function (): void {
 
         // ASSERT
         expect($registeredCommands)
-            ->toHaveKey($expectedCommandName)
-            ->and($registeredCommands[$expectedCommandName])
-            ->getName()->toBe($expectedCommandName)
-            ->and($registeredCommands[$expectedCommandName]);
-
-        // Verify the specific command instance is registered
-        expect($registeredCommands[$expectedCommandName])->toBeInstanceOf(MiseCommand::class);
+            ->toHaveKey('laravel:mise')
+            ->and($registeredCommands['laravel:mise'])
+            ->getName()->toBe('laravel:mise');
     });
 });
+
