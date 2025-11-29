@@ -30,8 +30,7 @@ arch('source code does not depend on tests')
 // Ensure tests don't use inappropriate testing patterns
 arch('tests follow best practices')
     ->expect('Tests')
-    ->not->toUse(['ReflectionClass', 'ReflectionMethod'])
-    ->ignoring('Tests\Feature\Commands\MiseCommandTest'); // Exception for package verification tests
+    ->not->toUse(['ReflectionClass', 'ReflectionMethod']);
 
 // Ensure no raw file operations in source code (use facades)
 arch('source code uses Laravel facades for file operations')

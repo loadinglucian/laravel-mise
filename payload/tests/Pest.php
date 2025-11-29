@@ -26,11 +26,6 @@ pest()->extend(Tests\FeatureTestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
 
-// Integration Tests: Multiple components, database, real services
-pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Integration');
-
 // Unit Tests: Pure business logic, mocked dependencies, no database
 pest()->extend(Tests\TestCase::class)
     ->in('Unit');

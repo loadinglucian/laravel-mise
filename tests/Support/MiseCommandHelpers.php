@@ -125,7 +125,7 @@ trait MiseCommandHelpers
     }
 
     //
-    // Mocking Helpers (for Integration Tests)
+    // Mocking Helpers (for Feature Tests)
     // -------------------------------------------------------------------------------
 
     /**
