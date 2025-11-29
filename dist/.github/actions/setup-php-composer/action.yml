@@ -1,24 +1,24 @@
-name: "Setup PHP and Composer"
-description: "Sets up PHP with all required extensions and installs Composer dependencies with caching"
+name: 'Setup PHP and Composer'
+description: 'Sets up PHP with all required extensions and installs Composer dependencies with caching'
 
 inputs:
   php-version:
-    description: "PHP version to setup"
+    description: 'PHP version to setup'
     required: false
-    default: "8.4"
+    default: '8.5'
   coverage:
-    description: "Enable xdebug for coverage collection"
+    description: 'Enable xdebug for coverage collection'
     required: false
-    default: "false"
+    default: 'false'
   flux-username:
-    description: "Flux UI username"
+    description: 'Flux UI username'
     required: true
   flux-license-key:
-    description: "Flux UI license key"
+    description: 'Flux UI license key'
     required: true
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
