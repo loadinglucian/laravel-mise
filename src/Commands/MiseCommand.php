@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Process;
 
 //
 // Mise en Place Command - Laravel Package Installation & Configuration
-// -------------------------------------------------------------------------------
+// ----
 //
 // This command provides an opinionated selection of packages and configurations
 // for Laravel projects. It handles Composer packages, NPM packages, and copies
@@ -20,7 +20,7 @@ class MiseCommand extends Command
 {
     //
     // Command Definition
-    // -------------------------------------------------------------------------------
+    // ----
 
     protected $signature = 'laravel:mise
         {--files : Only copy files}
@@ -33,14 +33,14 @@ class MiseCommand extends Command
 
     //
     // Post-Payload Commands Collection
-    // -------------------------------------------------------------------------------
+    // ----
 
     /** @var array<array<string>> */
     protected array $postPayloadCommands = [];
 
     //
     // Main Entry Point
-    // -------------------------------------------------------------------------------
+    // ----
 
     public function handle(): int
     {
@@ -146,7 +146,7 @@ class MiseCommand extends Command
 
     //
     // Package Installation
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Install packages and handle their configurations
@@ -219,7 +219,7 @@ class MiseCommand extends Command
 
     //
     // External Process Execution
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Execute multiple commands in sequence
@@ -296,7 +296,7 @@ class MiseCommand extends Command
 
     //
     // File Operations
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Copy all files from the payload directory to the project
@@ -386,7 +386,7 @@ class MiseCommand extends Command
 
     //
     // Composer JSON Management
-    // -------------------------------------------------------------------------------
+    // ----
 
     /**
      * Update composer.json with package-specific configuration
