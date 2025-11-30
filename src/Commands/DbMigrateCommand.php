@@ -27,7 +27,7 @@ class DbMigrateCommand extends Command
     {
         //
         // Forward to Migrate Command
-        // -------------------------------------------------------------------------------
+        // ----
 
         // Build options array, filtering out null/false values
         $options = array_filter([

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 //
 // Global Debugging Prevention
-// -------------------------------------------------------------------------------
+// ----
 
 arch()
     ->expect('App')
@@ -19,7 +19,7 @@ arch()
 
 //
 // Preset Architecture Rules
-// -------------------------------------------------------------------------------
+// ----
 
 arch()->preset()->php();
 arch()->preset()->laravel();
@@ -27,7 +27,7 @@ arch()->preset()->security();
 
 //
 // Strict Layered Architecture Enforcement
-// -------------------------------------------------------------------------------
+// ----
 
 // Layer 1: Controllers must NOT directly use Models or Repositories
 arch()
@@ -69,7 +69,7 @@ arch()
 
 //
 // Directory Structure Enforcement
-// -------------------------------------------------------------------------------
+// ----
 
 arch()
     ->expect('App\Models')
@@ -81,7 +81,7 @@ arch()
 
 //
 // Naming Conventions Enforcement
-// -------------------------------------------------------------------------------
+// ----
 
 arch()
     ->expect('App\Http\Controllers')
@@ -105,7 +105,7 @@ arch()
 
 //
 // Interface and Contract Enforcement
-// -------------------------------------------------------------------------------
+// ----
 
 arch()
     ->expect('App\Repositories')
@@ -113,7 +113,7 @@ arch()
 
 //
 // Conditional Architecture Tests
-// -------------------------------------------------------------------------------
+// ----
 
 // For conditional tests that require complex logic, we keep traditional test format
 it('controllers extend base controller when it exists', function (): void {

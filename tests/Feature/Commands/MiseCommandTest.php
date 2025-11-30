@@ -2,7 +2,7 @@
 
 //
 // MiseCommand Feature Tests - End-to-end command behavior
-// -------------------------------------------------------------------------------
+// ----
 
 declare(strict_types=1);
 
@@ -87,7 +87,7 @@ describe('MiseCommand Feature Tests', function (): void {
 
     //
     // Composer.json Management (File Boundaries)
-    // -------------------------------------------------------------------------------
+    // ----
 
     describe('composer.json management', function (): void {
         it('adds scripts to composer.json when no scripts section exists', function (): void {
@@ -190,7 +190,7 @@ describe('MiseCommand Feature Tests', function (): void {
 
     //
     // File Operations (File System Boundaries)
-    // -------------------------------------------------------------------------------
+    // ----
 
     describe('file operations', function (): void {
         beforeEach(function (): void {
@@ -235,7 +235,7 @@ describe('MiseCommand Feature Tests', function (): void {
 
     //
     // Error Handling (Process/System Failures)
-    // -------------------------------------------------------------------------------
+    // ----
 
     describe('error handling', function (): void {
         it('handles composer installation failures', function (): void {

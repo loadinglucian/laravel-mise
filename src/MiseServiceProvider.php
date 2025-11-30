@@ -25,7 +25,7 @@ class MiseServiceProvider extends ServiceProvider
     {
         //
         // Package Configuration Registration
-        // -------------------------------------------------------------------------------
+        // ----
 
         // Register internal package configurations
         // These are not meant to be published/customized by users
