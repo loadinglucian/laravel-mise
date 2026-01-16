@@ -132,7 +132,7 @@ readonly class ComposerJsonService
             $scriptKey = (string) $scriptName;
 
             /** @var array<int, string> $stringCommands */
-            $stringCommands = array_values(array_filter($commands, 'is_string'));
+            $stringCommands = array_values(array_filter($commands, is_string(...)));
 
             if (! isset($data['scripts'][$scriptKey])) {
                 $data['scripts'][$scriptKey] = $stringCommands;
