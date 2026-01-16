@@ -1,14 +1,18 @@
 name: CI Canary
 
+permissions:
+  contents: read
+
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   canary:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout code

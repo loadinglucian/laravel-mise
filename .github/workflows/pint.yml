@@ -1,14 +1,18 @@
 name: Pint
 
+permissions:
+  contents: read
+
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 jobs:
   pint:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Checkout code
@@ -18,4 +22,4 @@ jobs:
         uses: ./.github/actions/setup-php-composer
 
       - name: Check code style
-        run: vendor/bin/pint --test
+        run: vendor/bin/pint --test --parallel
