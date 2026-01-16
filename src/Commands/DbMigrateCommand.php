@@ -2,24 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Bigpixelrocket\LaravelMise\Commands;
+namespace LaravelMise\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Process;
+use Symfony\Component\Process\Process as SymfonyProcess;
 
 class DbMigrateCommand extends Command
 {
-    protected $signature = 'db:migrate
-        {--database= : The database connection to use}
-        {--force : Force the operation to run when in production}
-        {--path=* : The path(s) to the migrations files to be executed}
-        {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
-        {--schema-path= : The path to a schema dump file}
-        {--pretend : Dump the SQL queries that would be run}
-        {--seed : Indicates if the seed task should be run}
-        {--seeder= : The class name of the root seeder}
-        {--step : Force the migrations to be run so they can be rolled back individually}
-        {--graceful : Return a successful exit code even if an error occurs}
-        {--isolated= : Do not run the command if another instance of the command is already running}';
+    protected $signature = 'db:migrate';
 
     protected $description = 'Alias for the migrate command - Run the database migrations';
 
@@ -29,31 +20,20 @@ class DbMigrateCommand extends Command
         // Forward to Migrate Command
         // ----
 
-        // Build options array, filtering out null/false values
-        $options = array_filter([
-            '--database' => $this->option('database'),
-            '--force' => $this->option('force'),
-            '--path' => $this->option('path'),
-            '--realpath' => $this->option('realpath'),
-            '--schema-path' => $this->option('schema-path'),
-            '--pretend' => $this->option('pretend'),
-            '--seed' => $this->option('seed'),
-            '--seeder' => $this->option('seeder'),
-            '--step' => $this->option('step'),
-            '--graceful' => $this->option('graceful'),
-            '--isolated' => $this->option('isolated'),
-        ], $this->isValidOption(...));
+        /** @var array<int, string> $argv */
+        $argv = $_SERVER['argv'];
 
-        return $this->call('migrate', $options);
-    }
+        // Forward all arguments to the migrate command
+        $args = array_slice($argv, 2);
 
-    /**
-     * Determine if the given value is a valid option.
-     *
-     * @param  mixed  $value
-     */
-    private function isValidOption($value): bool
-    {
-        return ! in_array($value, [false, null, []], true);
+        $process = Process::forever();
+
+        if (SymfonyProcess::isTtySupported()) {
+            $process = $process->tty();
+        }
+
+        $result = $process->run([PHP_BINARY, 'artisan', 'migrate', ...$args]);
+
+        return $result->exitCode() ?? 1;
     }
 }
