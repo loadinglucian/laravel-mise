@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Bigpixelrocket\LaravelMise\MiseServiceProvider;
+use LaravelMise\MiseServiceProvider;
 use Illuminate\Support\Facades\Artisan;
 
 describe('MiseServiceProvider Feature Tests', function (): void {
