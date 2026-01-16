@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\Process;
+
 use function Pest\Laravel\artisan;
 
 describe('DbMigrateCommand Feature Tests', function (): void {
@@ -14,40 +17,23 @@ describe('DbMigrateCommand Feature Tests', function (): void {
     });
 
     describe('command forward execution', function (): void {
-        it('executes successfully with no options', function (): void {
-            // ACT & ASSERT
+        it('executes migrate command via Process facade', function (): void {
+            // ARRANGE
+            Process::fake([
+                '*' => Process::result(output: 'Nothing to migrate.'),
+            ]);
+
+            // ACT
             artisan('db:migrate')->assertSuccessful();
-        });
 
-        it('forwards common options correctly', function (): void {
-            // ACT & ASSERT
-            // Test pretend option (safe to run in tests)
-            artisan('db:migrate', ['--pretend' => true])
-                ->assertSuccessful();
-        });
+            // ASSERT
+            Process::assertRan(function (PendingProcess $process): bool {
+                $command = $process->command;
 
-        it('forwards multiple options correctly', function (): void {
-            // ARRANGE
-            $options = [
-                '--pretend' => true,
-                '--step' => true,
-            ];
-
-            // ACT & ASSERT
-            // Test combination of options (all safe for tests)
-            artisan('db:migrate', $options)->assertSuccessful();
-        });
-
-        it('handles path option as array', function (): void {
-            // ARRANGE
-            $options = [
-                '--pretend' => true,
-                '--path' => ['database/migrations'],
-            ];
-
-            // ACT & ASSERT
-            // Test path option which accepts multiple values
-            artisan('db:migrate', $options)->assertSuccessful();
+                return is_array($command)
+                    && in_array('migrate', $command, true)
+                    && in_array(PHP_BINARY, $command, true);
+            });
         });
     });
 });

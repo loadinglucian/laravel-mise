@@ -12,9 +12,14 @@ updates:
     schedule:
       interval: 'daily'
     target-branch: 'main'
+    open-pull-requests-limit: 10
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
+    groups:
+      actions:
+        patterns:
+          - '*'
 
   - package-ecosystem: 'composer'
     directory: '/'
@@ -22,23 +27,31 @@ updates:
       interval: 'daily'
     target-branch: 'main'
     versioning-strategy: 'increase'
+    open-pull-requests-limit: 10
     labels:
       - 'dependencies'
       - 'php'
-    registries:
-      - composer-fluxui
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
+    groups:
+      php-dependencies:
+        patterns:
+          - '*'
 
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'daily'
     target-branch: 'main'
+    open-pull-requests-limit: 10
     labels:
       - 'dependencies'
-      - 'bun'
+      - 'javascript'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
+    groups:
+      npm-dependencies:
+        patterns:
+          - '*'
