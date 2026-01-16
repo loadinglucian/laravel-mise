@@ -7,6 +7,7 @@
 declare(strict_types=1);
 
 use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
 use LaravelMise\Commands\MiseCommand;
@@ -74,6 +75,26 @@ describe('MiseCommand Feature Tests', function (): void {
     // ----
 
     describe('error handling', function (): void {
+        it('fails when composer-packages config is not an array', function (): void {
+            // ARRANGE
+            Config::set('laravel-mise.composer-packages', 'invalid');
+
+            // ACT
+            $this->runMise()
+                ->expectsOutputToContain('Invalid composer packages configuration')
+                ->assertFailed();
+        });
+
+        it('fails when node-packages config is not an array', function (): void {
+            // ARRANGE
+            Config::set('laravel-mise.node-packages', 'invalid');
+
+            // ACT
+            $this->runMise()
+                ->expectsOutputToContain('Invalid node packages configuration')
+                ->assertFailed();
+        });
+
         it('fails when composer update fails', function (): void {
             // ARRANGE
             Process::fake(['*' => Process::result('', 'Network error', 1)]);

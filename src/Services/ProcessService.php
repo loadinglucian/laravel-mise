@@ -35,27 +35,4 @@ readonly class ProcessService
 
         return $process->run();
     }
-
-    /**
-     * Execute multiple commands in sequence.
-     * Stops on first failure.
-     *
-     * @param  array<array<string>>  $commands
-     * @return array{success: bool, results: array<ProcessResult>}
-     */
-    public function runBatch(array $commands): array
-    {
-        $results = [];
-
-        foreach ($commands as $command) {
-            $result = $this->run($command);
-            $results[] = $result;
-
-            if (! $result->successful()) {
-                return ['success' => false, 'results' => $results];
-            }
-        }
-
-        return ['success' => true, 'results' => $results];
-    }
 }
