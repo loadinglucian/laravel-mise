@@ -8,11 +8,11 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
-use LaravelMise\Commands\MiseCommand;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Testing\PendingCommand;
+use LaravelMise\Commands\MiseCommand;
 
 use function Pest\Laravel\artisan;
 

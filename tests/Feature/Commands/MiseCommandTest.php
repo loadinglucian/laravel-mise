@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-use LaravelMise\Commands\MiseCommand;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
+use LaravelMise\Commands\MiseCommand;
 use Tests\Support\MiseCommandHelpers;
 
 uses(MiseCommandHelpers::class);

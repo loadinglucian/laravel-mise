@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace LaravelMise\Services;
 
-use LaravelMise\Enums\NodeEnum;
 use Illuminate\Filesystem\Filesystem;
+use LaravelMise\Enums\NodeEnum;
 
 //
 // Node Detector - Package Manager Detection
