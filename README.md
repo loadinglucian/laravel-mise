@@ -180,6 +180,7 @@ The package copies pre-configured files to your project, organized by purpose:
 
 **Development:**
 
+- `.editorconfig` - Consistent formatting across editors (indentation, line endings)
 - `.cursorignore` - Cursor IDE ignore patterns
 - `scripts/get-changed-php-files.sh` - Git helper for changed file detection
 
