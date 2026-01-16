@@ -2,11 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Bigpixelrocket\LaravelMise;
+namespace LaravelMise;
 
-use Bigpixelrocket\LaravelMise\Commands\DbMigrateCommand;
-use Bigpixelrocket\LaravelMise\Commands\MiseCommand;
 use Illuminate\Support\ServiceProvider;
+use LaravelMise\Commands\DbMigrateCommand;
+use LaravelMise\Commands\MiseCommand;
+use LaravelMise\Services\ComposerJsonService;
+use LaravelMise\Services\NodeDetector;
+use LaravelMise\Services\PayloadService;
+use LaravelMise\Services\ProcessService;
 
 class MiseServiceProvider extends ServiceProvider
 {
@@ -27,16 +31,23 @@ class MiseServiceProvider extends ServiceProvider
         // Package Configuration Registration
         // ----
 
-        // Register internal package configurations
-        // These are not meant to be published/customized by users
         $this->mergeConfigFrom(
             __DIR__.'/../config/composer-packages.php',
             'laravel-mise.composer-packages'
         );
 
         $this->mergeConfigFrom(
-            __DIR__.'/../config/npm-packages.php',
-            'laravel-mise.npm-packages'
+            __DIR__.'/../config/node-packages.php',
+            'laravel-mise.node-packages'
         );
+
+        //
+        // Service Registration
+        // ----
+
+        $this->app->singleton(ProcessService::class);
+        $this->app->singleton(ComposerJsonService::class);
+        $this->app->singleton(PayloadService::class);
+        $this->app->singleton(NodeDetector::class);
     }
 }
