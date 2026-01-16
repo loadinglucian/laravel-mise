@@ -23,14 +23,5 @@ jobs:
         with:
           coverage: "true"
 
-      - name: Setup Bun
-        uses: ./.github/actions/setup-bun
-
-      - name: Build frontend
-        run: bun run build
-
-      - name: Generate APP_KEY
-        run: php artisan key:generate --env=testing --force
-
       - name: Execute tests with coverage
         run: vendor/bin/pest --parallel --coverage --coverage-text --min=70
