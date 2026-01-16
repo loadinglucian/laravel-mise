@@ -18,10 +18,7 @@
 #
 
 # Enable strict error handling and command tracing.
-set -e              # Exit immediately if a command exits with a non-zero status.
-set -u              # Treat unset variables as errors and exit immediately.
 set -o pipefail     # The return value of a pipeline is the status of the last command to exit with a non-zero status, or zero if all succeed.
-set -x              # Print each command and its arguments as they are executed.
 
 # Determine the base branch
 if [ -n "${GITHUB_BASE_REF:-}" ]; then
