@@ -1,17 +1,17 @@
 {
-    "name": "bigpixelrocket/laravel-mise",
+    "name": "loadinglucian/laravel-mise",
     "description": "A Laravel package that provides a curated selection of packages and configurations",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Bigpixelrocket\\LaravelMise\\": "src/"
+            "LaravelMise\\": "src/"
         }
     },
     "authors": [
         {
             "name": "Lucian Văcăroiu",
-            "email": "lucian@bigpixelrocket.com"
+            "email": "silviulucian@gmail.com"
         }
     ],
     "require": {
@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Bigpixelrocket\\LaravelMise\\MiseServiceProvider"
+                "LaravelMise\\MiseServiceProvider"
             ]
         }
     },
