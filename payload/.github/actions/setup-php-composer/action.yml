@@ -12,10 +12,12 @@ inputs:
     default: 'false'
   flux-username:
     description: 'Flux UI username'
-    required: true
+    required: false
+    default: ''
   flux-license-key:
     description: 'Flux UI license key'
-    required: true
+    required: false
+    default: ''
 
 runs:
   using: 'composite'
@@ -28,24 +30,11 @@ runs:
         coverage: ${{ inputs.coverage == 'true' && 'xdebug' || 'none' }}
 
     - name: Add Flux Credentials
+      if: inputs.flux-username != '' && inputs.flux-license-key != ''
       shell: bash
       run: composer config http-basic.composer.fluxui.dev "${{ inputs.flux-username }}" "${{ inputs.flux-license-key }}"
 
-    - name: Get Composer Cache Directory
-      id: composer-cache
-      shell: bash
-      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-    - name: Cache Composer dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          vendor
-          ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-php-${{ inputs.php-version }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-${{ inputs.php-version }}-composer-
-
     - name: Install Composer dependencies
-      shell: bash
-      run: composer install --prefer-dist --no-interaction --no-progress
+      uses: ramsey/composer-install@v3
+      with:
+        composer-options: --no-interaction --no-progress --prefer-dist
