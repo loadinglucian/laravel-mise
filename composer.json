@@ -1,17 +1,17 @@
 {
-    "name": "bigpixelrocket/laravel-mise",
+    "name": "loadinglucian/laravel-mise",
     "description": "A Laravel package that provides a curated selection of packages and configurations",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Bigpixelrocket\\LaravelMise\\": "src/"
+            "LaravelMise\\": "src/"
         }
     },
     "authors": [
         {
             "name": "Lucian Văcăroiu",
-            "email": "lucian@bigpixelrocket.com"
+            "email": "silviulucian@gmail.com"
         }
     ],
     "require": {
@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Bigpixelrocket\\LaravelMise\\MiseServiceProvider"
+                "LaravelMise\\MiseServiceProvider"
             ]
         }
     },
@@ -46,26 +46,20 @@
         }
     },
     "scripts": {
-        "changed-php-files": [
-            "./scripts/get-changed-php-files.sh"
-        ],
-        "changed-php-files:no-tests": [
-            "./scripts/get-changed-php-files.sh | grep -v '^tests/' | grep -v '^payload/tests/'"
-        ],
         "pall": [
-            "composer pint && composer rect && composer pstan && composer pest"
-        ],
-        "pint": [
-            "bash -c 'FILES=$(composer changed-php-files 2>/dev/null | tail -n +2); if [ -n \"$FILES\" ]; then echo \"$FILES\" | xargs -r ./vendor/bin/pint --parallel; else echo \"No PHP files changed, skipping Pint\"; fi'"
-        ],
-        "rect": [
-            "bash -c 'FILES=$(composer changed-php-files 2>/dev/null | tail -n +2); if [ -n \"$FILES\" ]; then echo \"$FILES\" | xargs -r ./vendor/bin/rector process; else echo \"No PHP files changed, skipping Rector\"; fi'"
-        ],
-        "pstan": [
-            "bash -c 'FILES=$(composer changed-php-files:no-tests 2>/dev/null | tail -n +2); if [ -n \"$FILES\" ]; then echo \"$FILES\" | xargs -r ./vendor/bin/phpstan analyse --memory-limit=2G --; else echo \"No non-test PHP files changed, skipping PHPStan\"; fi'"
+            "composer pint && composer pstan && composer rect && composer pest"
         ],
         "pest": [
             "vendor/bin/pest --parallel --coverage"
+        ],
+        "pint": [
+            "vendor/bin/pint --parallel"
+        ],
+        "pstan": [
+            "vendor/bin/phpstan analyse --memory-limit=2G"
+        ],
+        "rect": [
+            "vendor/bin/rector process"
         ]
     }
 }

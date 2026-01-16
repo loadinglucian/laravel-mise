@@ -8,11 +8,11 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
-use Bigpixelrocket\LaravelMise\Commands\MiseCommand;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use Illuminate\Testing\PendingCommand;
+use LaravelMise\Commands\MiseCommand;
 
 use function Pest\Laravel\artisan;
 
@@ -23,9 +23,11 @@ trait MiseCommandHelpers
     // ----
 
     /**
-     * Run mise command with options
+     * Run mise command with optional options.
+     *
+     * @param  array<string, mixed>  $options
      */
-    protected function runMiseWithOptions(array $options): \Illuminate\Testing\PendingCommand
+    protected function runMise(array $options = []): PendingCommand
     {
         return artisan(MiseCommand::class, $options);
     }
@@ -35,7 +37,7 @@ trait MiseCommandHelpers
     // ----
 
     /**
-     * Extract command string from PendingProcess for assertions
+     * Extract command string from PendingProcess for assertions.
      */
     protected function extractCommand(PendingProcess $process): string
     {
@@ -43,7 +45,7 @@ trait MiseCommandHelpers
     }
 
     /**
-     * Assert that a command containing the specified fragment was run
+     * Assert that a command containing the specified fragment was run.
      */
     protected function assertCommandRan(string $commandFragment): void
     {
@@ -55,7 +57,7 @@ trait MiseCommandHelpers
     }
 
     /**
-     * Assert that a command containing the specified fragment was NOT run
+     * Assert that a command containing the specified fragment was NOT run.
      */
     protected function assertCommandDidntRun(string $commandFragment): void
     {
@@ -71,7 +73,7 @@ trait MiseCommandHelpers
     // ----
 
     /**
-     * Set test package configurations
+     * Set test package configurations.
      */
     protected function setTestPackageConfigs(): void
     {
@@ -118,39 +120,9 @@ trait MiseCommandHelpers
             ],
         ]);
 
-        Config::set('laravel-mise.npm-packages', [
+        Config::set('laravel-mise.node-packages', [
             'dependencies' => ['tailwindcss', '@tailwindcss/vite'],
             'devDependencies' => ['prettier', 'prettier-plugin-blade'],
         ]);
-    }
-
-    //
-    // Mocking Helpers (for Feature Tests)
-    // ----
-
-    /**
-     * Mock composer.json file with content
-     */
-    protected function mockComposerJson(array $content, bool $exists = true): void
-    {
-        File::shouldReceive('exists')
-            ->with(base_path('composer.json'))
-            ->andReturn($exists);
-
-        if ($exists) {
-            File::shouldReceive('get')
-                ->with(base_path('composer.json'))
-                ->andReturn(json_encode($content, JSON_PRETTY_PRINT));
-        }
-    }
-
-    /**
-     * Mock composer.json write operations
-     */
-    protected function mockComposerJsonWrite(): void
-    {
-        File::shouldReceive('put')
-            ->with(base_path('composer.json'), \Mockery::any())
-            ->andReturn(true);
     }
 }

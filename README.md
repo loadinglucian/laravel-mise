@@ -1,78 +1,222 @@
 # Laravel Mise en Place
 
-A Laravel package that provides a curated selection of packages and configurations for your next Laravel project. This package installs and configures a thoughtfully selected set of development tools and packages.
+- [Introduction](#introduction)
+- [Requirements](#requirements)
+- [Installation](#installation)
+    - [Install Everything](#install-everything)
+    - [Force Mode](#force-mode)
+- [Quickstart](#quickstart)
+- [What Gets Installed](#what-gets-installed)
+    - [Composer Packages](#composer-packages)
+    - [Node Packages](#node-packages)
+    - [Configuration Files](#configuration-files)
+- [Command Options](#command-options)
+- [Additional Features](#additional-features)
+    - [Database Migration Alias](#database-migration-alias)
+    - [Automatic Composer.json Configuration](#automatic-composerjson-configuration)
+- [Post-Installation](#post-installation)
+    - [Automatic Code Quality Checks](#automatic-code-quality-checks)
+    - [Additional Setup](#additional-setup)
+- [License](#license)
 
-## Features
+<a name="introduction"></a>
 
-- **Curated Package Selection**: Installs popular and well-maintained packages for modern Laravel development
-- **Pre-configured Tools**: Copies ready-to-use configuration files for development tools
-- **Flexible Installation**: Choose to install only specific parts (composer packages, npm packages, or configuration files)
-- **GitHub Actions**: Includes pre-configured workflows for CI/CD
-- **Code Quality Tools**: Sets up PHPStan, Pint, Pest, and Prettier with sensible defaults
+## Introduction
+
+In professional kitchens, chefs practice "mise en place" — a French phrase meaning "everything in its place." Before cooking begins, every ingredient is prepped, every tool is positioned, and the workspace is ready. This preparation transforms chaos into flow, allowing chefs to focus on creating rather than searching.
+
+Laravel Mise brings this philosophy to your development environment. Instead of spending your first hour on a new project installing packages, configuring linters, and setting up GitHub workflows, you'll run a single command and get straight to building. The package installs a curated selection of modern development tools — Livewire, PHPStan, Pint, Pest, Prettier, and more — all pre-configured with sensible defaults.
+
+<a name="requirements"></a>
 
 ## Requirements
 
 - PHP ^8.5
 - Laravel ^12.40
 
+Don't worry — if you're running a recent Laravel installation, you'll already meet these requirements.
+
+<a name="installation"></a>
+
 ## Installation
 
-Install the package via Composer:
+You may install the package via Composer:
 
-```bash
-composer require --dev bigpixelrocket/laravel-mise:dev-main
+```shell
+composer require --dev loadinglucian/laravel-mise:dev-main
 ```
 
-The package will automatically register itself via Laravel's package discovery.
+> [!NOTE]
+> The package automatically registers itself via Laravel's package discovery. You don't need to add anything to your `config/app.php`.
 
-## Usage
+<a name="install-everything"></a>
 
-### Install Everything (Recommended)
+### Install Everything
 
-Run the mise command to install all packages and copy all configuration files:
+To install all packages and copy all configuration files, run the mise command:
 
-```bash
+```shell
 php artisan laravel:mise
 ```
 
-The command will automatically configure your `composer.json` file with package-specific settings (like scripts and repositories) when installing certain packages. You'll be prompted to confirm these changes before they're applied.
+The command installs Composer and NPM packages, copies configuration files to your project, and automatically configures your `composer.json` with useful scripts and settings.
 
-### Selective Installation
+<a name="force-mode"></a>
 
-You can choose to install only specific parts:
+### Force Mode
 
-```bash
-# Install only Composer packages
-php artisan laravel:mise --composer
+If you're setting up a fresh project or want to replace existing configuration files, use the `--force` flag:
 
-# Install only NPM packages
-php artisan laravel:mise --npm
-
-# Copy only configuration files
-php artisan laravel:mise --files
-
-# Force overwrite existing files when copying
-php artisan laravel:mise --files --force
-
-# Skip composer.json modifications entirely
-php artisan laravel:mise --skip-composer-json
+```shell
+php artisan laravel:mise --force
 ```
 
-### Composer.json Configuration
+> [!WARNING]
+> Force mode overwrites existing files without confirmation. If you've customized your configuration files (like `phpstan.neon` or `pint.json`), back them up first or your changes will be lost.
 
-When installing Composer packages, the command automatically adds package-specific configurations to your `composer.json` file, such as:
+<a name="quickstart"></a>
 
-- **Scripts**: Adds useful scripts like IDE helper generation
-- **Repositories**: Adds any required package repositories
-- **Configuration**: Updates config and extra sections as needed
+## Quickstart
 
-You'll be prompted to confirm each change before it's applied. If you prefer to skip these modifications entirely, use the `--skip-composer-json` flag.
+To see Laravel Mise in action, let's walk through a typical installation. By following this example, you'll understand what happens when you run the command and what your project looks like afterward.
+
+Start with a fresh Laravel project and run the mise command:
+
+```shell
+laravel new my-project
+cd my-project
+composer require --dev loadinglucian/laravel-mise:dev-main
+php artisan laravel:mise
+```
+
+The command will:
+
+1. Install Composer packages (Livewire, PHPStan, Pest, etc.)
+2. Update your `composer.json` with scripts like `pint`, `pstan`, and `pest`
+3. Detect your package manager (npm, yarn, pnpm, or bun) and install frontend dependencies
+4. Copy configuration files for all your new tools
+5. Run Pint, Rector, and PHPStan to ensure everything passes from the start
+
+Once complete, you can immediately run code quality checks:
+
+```shell
+composer pall   # Run all checks: pint → rector → phpstan → pest
+composer pint   # Fix code style issues
+composer pstan  # Run static analysis
+composer pest   # Run your test suite
+```
+
+<a name="what-gets-installed"></a>
+
+## What Gets Installed
+
+<a name="composer-packages"></a>
+
+### Composer Packages
+
+**Production Dependencies:**
+
+These packages enhance your application's capabilities:
+
+- `livewire/livewire` - Build dynamic interfaces without leaving PHP
+- `livewire/flux` - Modern UI components designed for Livewire applications
+- `spatie/laravel-data` - Create powerful data objects with validation and transformation
+
+**Development Dependencies:**
+
+These tools help you write better code and catch issues early:
+
+- `barryvdh/laravel-debugbar` - Debug your application with an in-browser toolbar
+- `barryvdh/laravel-ide-helper` - Get proper IDE autocompletion for Laravel's magic
+- `beyondcode/laravel-query-detector` - Catch N+1 query problems before they hit production
+- `rector/rector` - Automatically upgrade and refactor your codebase
+- `laravel/pint` - Keep your code style consistent with zero configuration
+- `larastan/larastan` - Find bugs through static analysis at PHPStan's maximum level
+- `pestphp/pest` - Write expressive tests with a delightful syntax
+- `pestphp/pest-plugin-arch` - Enforce architectural rules in your test suite
+- `roave/security-advisories` - Block installation of packages with known vulnerabilities
+
+<a name="node-packages"></a>
+
+### Node Packages
+
+**Dependencies:**
+
+- `tailwindcss` - Build custom designs without writing custom CSS
+- `@tailwindcss/vite` - Integrate Tailwind seamlessly with Vite
+
+**Development Dependencies:**
+
+- `prettier` - Format your code consistently across the team
+- `prettier-plugin-blade` - Format Blade templates alongside your other files
+- `prettier-plugin-tailwindcss` - Automatically sort Tailwind classes
+
+<a name="configuration-files"></a>
+
+### Configuration Files
+
+The package copies pre-configured files to your project, organized by purpose:
+
+**Code Quality:**
+
+- `phpstan.neon` - PHPStan configuration at maximum strictness
+- `pint.json` - Laravel Pint with the Laravel preset
+- `rector.php` - Rector rules for automated refactoring
+- `.prettierrc` - Prettier configuration for frontend files
+
+**Testing:**
+
+- `phpunit.xml` - PHPUnit configuration
+- `tests/Pest.php` - Pest configuration
+- `tests/FeatureTestCase.php` - Base test case for feature tests
+- `tests/CICanary.php` - CI health check test
+- `tests/Arch/ArchTest.php` - Architecture tests
+- `tests/Feature/ArchTest.php` - Feature architecture tests
+
+**Application Scaffolding:**
+
+- `app/Contracts/RepositoryInterface.php` - Repository pattern interface
+- `app/Repositories/BaseRepository.php` - Base repository implementation
+
+**Development:**
+
+- `.cursorignore` - Cursor IDE ignore patterns
+- `scripts/get-changed-php-files.sh` - Git helper for changed file detection
+
+**GitHub Integration:**
+
+- `.github/workflows/pest.yml` - Automated testing workflow
+- `.github/workflows/phpstan.yml` - Static analysis workflow
+- `.github/workflows/pint.yml` - Code style checking workflow
+- `.github/workflows/rector.yml` - Automated refactoring workflow
+- `.github/workflows/ci-canary.yml` - CI health check workflow
+- `.github/workflows/dependabot-automerge.yml` - Auto-merge Dependabot PRs
+- `.github/dependabot.yml` - Dependabot configuration
+- `.github/rulesets/protect_main.json` - Branch protection ruleset
+- `.github/actions/setup-bun/action.yml` - Reusable Bun setup action
+- `.github/actions/setup-php-composer/action.yml` - Reusable PHP/Composer setup action
+
+<a name="command-options"></a>
+
+## Command Options
+
+| Option    | Description                                           |
+| --------- | ----------------------------------------------------- |
+| `--force` | Override existing files and skip confirmation prompts |
+
+<a name="additional-features"></a>
+
+## Additional Features
+
+<a name="database-migration-alias"></a>
 
 ### Database Migration Alias
 
-Maybe it's just muscle memory from my Rails days but I very frequently find myself trying to run `db:migrate` and then staring blankly at the screen when I get that `Command "db:migrate" is not defined.` error. It just makes sense to me that the `migrate` command should be in the `db:*` namespace. This package adds that `db:migrate` command, which conveniently simply forwards everything to the standard Laravel `migrate` command:
+Maybe it's muscle memory from Rails days, but many developers instinctively type `db:migrate` and then stare blankly at Laravel's `Command "db:migrate" is not defined` error. It makes sense that migrations should live in the `db:*` namespace.
 
-```bash
+This package adds that missing command. It forwards everything to Laravel's standard `migrate` command:
+
+```shell
 # Run database migrations (equivalent to 'php artisan migrate')
 php artisan db:migrate
 
@@ -80,107 +224,58 @@ php artisan db:migrate
 php artisan db:migrate --force --seed
 ```
 
-## What Gets Installed
+<a name="automatic-composerjson-configuration"></a>
 
-### Composer Packages
+### Automatic Composer.json Configuration
 
-**Production Dependencies:**
+When installing Composer packages, the command automatically configures your `composer.json` with settings that would otherwise require manual setup:
 
-- `livewire/flux` - Modern UI component library for Livewire applications
-- `livewire/livewire` - Full-stack framework for Laravel
-- `spatie/laravel-data` - Powerful data objects for Laravel
+- **Scripts**: Adds `pint`, `pstan`, `rect`, `pest`, and `pall` commands
+- **Repositories**: Configures any required package repositories
+- **Configuration**: Updates config and extra sections as needed
 
-**Development Dependencies:**
+This means you can run `composer pall` immediately after installation — no manual configuration required.
 
-- `barryvdh/laravel-debugbar` - Laravel debug bar for debugging
-- `barryvdh/laravel-ide-helper` - IDE helper for Laravel
-- `beyondcode/laravel-query-detector` - N+1 query detection
-- `larastan/larastan` - Static analysis
-- `laravel/pint` - Code style enforcement
-- `pestphp/pest` - Testing framework
-
-### NPM Packages
-
-**Dependencies:**
-
-- `tailwindcss` - Utility-first CSS framework
-- `@tailwindcss/vite` - Tailwind CSS Vite plugin
-
-**Development Dependencies:**
-
-- `prettier` - Code formatter
-- `prettier-plugin-blade` - Blade template formatting
-- `prettier-plugin-tailwindcss` - Tailwind CSS class sorting
-
-### Configuration Files
-
-The package copies the following configuration files to your project:
-
-- **Code Quality:**
-    - `phpstan.neon` - PHPStan configuration
-    - `pint.json` - Laravel Pint configuration
-    - `.prettierrc` - Prettier configuration
-
-- **Development:**
-    - `TESTING.md` - Testing guidelines and best practices
-    - `AGENTS.md` - AI agent guidelines
-    - `CLAUDE.md` - Claude AI specific guidelines
-    - `.cursorrules` - Cursor IDE rules
-    - `.cursorignore` - Cursor ignore patterns
-
-- **GitHub Integration:**
-    - `.github/workflows/pest.yml` - Pest testing workflow
-    - `.github/workflows/phpstan.yml` - PHPStan analysis workflow
-    - `.github/workflows/pint.yml` - Code style checking workflow
-    - `.github/workflows/dependabot-automerge.yml` - Dependabot auto-merge workflow
-    - `.github/dependabot.yml` - Dependabot configuration
-    - `.github/rulesets/protect_main.json` - Branch protection ruleset
-
-## Command Options
-
-### laravel:mise Command
-
-| Option                 | Description                                               |
-| ---------------------- | --------------------------------------------------------- |
-| `--composer`           | Install only Composer packages                            |
-| `--npm`                | Install only NPM packages                                 |
-| `--files`              | Copy only configuration files                             |
-| `--force`              | Override existing files when copying (use with `--files`) |
-| `--skip-composer-json` | Skip automatic composer.json configuration updates        |
+<a name="post-installation"></a>
 
 ## Post-Installation
 
+<a name="automatic-code-quality-checks"></a>
+
 ### Automatic Code Quality Checks
 
-The package automatically runs code quality tools after installation:
+The package runs code quality tools automatically after installation:
 
-- **Laravel Pint**: Automatically fixes code style issues in your project
-- **PHPStan**: Automatically runs static analysis to identify potential issues
+- **Laravel Pint** fixes code style issues throughout your project
+- **Rector** applies automated refactoring rules
+- **PHPStan** runs static analysis to identify potential issues
 
-These automatic checks help ensure your code follows best practices from the start.
+These checks ensure your codebase follows best practices from the very first commit.
+
+<a name="additional-setup"></a>
 
 ### Additional Setup
 
-Some packages may require additional setup steps:
+Some packages require a few manual steps to complete their setup.
 
-### Livewire Flux
+**Livewire Flux:**
 
-- Configuration is published automatically during installation
-- **Important**: For complete setup including asset publishing and layout configuration, follow the [official Flux installation guide](https://fluxui.dev/docs/installation)
-- You'll need to add the `@fluxAppearance` and `@fluxScripts` directives to your layout file
-- Consider using the Inter font family for optimal appearance
+The Flux configuration is published automatically during installation. However, you'll need to complete the setup manually:
 
-### Tailwind CSS
+> [!NOTE]
+> For complete Flux setup including asset publishing and layout configuration, follow the [official Flux installation guide](https://fluxui.dev/docs/installation). You'll need to add the `@fluxAppearance` and `@fluxScripts` directives to your layout file.
 
-- You'll need to import the Tailwind Vite plugin in your `vite.config.js` file
-- You'll need to add `@import "tailwindcss";` to your CSS file
-- For detailed setup instructions and additional configuration options, see the [official Tailwind CSS Vite guide](https://tailwindcss.com/docs/installation/using-vite)
+**Tailwind CSS:**
+
+The Tailwind packages are installed, but you'll need to configure Vite:
+
+> [!NOTE]
+> Import the Tailwind Vite plugin in your `vite.config.js` and add `@import "tailwindcss";` to your CSS file. For detailed instructions, see the [official Tailwind CSS Vite guide](https://tailwindcss.com/docs/installation/using-vite).
+
+<a name="license"></a>
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
+Laravel Mise is open-source software distributed under the [MIT License](./LICENSE).
 
-## Credits
-
-- [Lucian Văcăroiu](https://github.com/lucianvacaroiu)
-- [Bigpixelrocket](https://bigpixelrocket.com)
+You can use it freely for personal or commercial projects, without any restrictions.

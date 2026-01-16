@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Bigpixelrocket\LaravelMise\MiseServiceProvider;
+use LaravelMise\MiseServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra

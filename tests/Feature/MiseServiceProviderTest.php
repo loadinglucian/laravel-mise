@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use Bigpixelrocket\LaravelMise\MiseServiceProvider;
 use Illuminate\Support\Facades\Artisan;
+use LaravelMise\MiseServiceProvider;
 
 describe('MiseServiceProvider Feature Tests', function (): void {
     it('is registered as a service provider in the package', function (): void {

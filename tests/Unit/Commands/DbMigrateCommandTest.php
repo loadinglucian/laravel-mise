@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Bigpixelrocket\LaravelMise\Commands\DbMigrateCommand;
+use LaravelMise\Commands\DbMigrateCommand;
 
 describe('DbMigrateCommand Unit Tests', function (): void {
     describe('command interface', function (): void {
@@ -15,26 +15,23 @@ describe('DbMigrateCommand Unit Tests', function (): void {
                 ->and($command->getDescription())->toBe('Alias for the migrate command - Run the database migrations');
         });
 
-        it('supports all migrate command options', function (): void {
+        it('has minimal signature for process forwarding', function (): void {
             // ARRANGE
             $command = new DbMigrateCommand;
             $defaultOptions = ['help', 'quiet', 'verbose', 'version', 'ansi', 'no-ansi', 'no-interaction', 'env'];
-            $expectedOptions = [
-                'database', 'force', 'path', 'realpath', 'schema-path',
-                'pretend', 'seed', 'seeder', 'step', 'graceful', 'isolated',
-            ];
 
             // ACT
             $definition = $command->getDefinition();
             $options = $definition->getOptions();
-            $customOptions = array_filter($options, static fn ($key) => ! in_array($key, $defaultOptions), ARRAY_FILTER_USE_KEY);
+            $customOptions = array_filter(
+                $options,
+                static fn ($key) => ! in_array($key, $defaultOptions, true),
+                ARRAY_FILTER_USE_KEY,
+            );
 
             // ASSERT
-            foreach ($expectedOptions as $option) {
-                expect($customOptions)->toHaveKey($option);
-            }
-
-            expect($customOptions)->toHaveCount(count($expectedOptions));
+            // Command uses Process forwarding, so no custom options defined
+            expect($customOptions)->toHaveCount(0);
         });
     });
 });
