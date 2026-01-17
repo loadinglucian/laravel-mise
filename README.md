@@ -12,6 +12,7 @@
     - [Configuration Files](#configuration-files)
 - [Command Options](#command-options)
 - [Additional Features](#additional-features)
+    - [Session Configuration](#session-configuration)
     - [Database Migration Alias](#database-migration-alias)
     - [Automatic Composer.json Configuration](#automatic-composerjson-configuration)
 - [Post-Installation](#post-installation)
@@ -197,6 +198,10 @@ The package copies pre-configured files to your project, organized by purpose:
 - `.github/actions/setup-bun/action.yml` - Reusable Bun setup action
 - `.github/actions/setup-php-composer/action.yml` - Reusable PHP/Composer setup action
 
+**Environment:**
+
+- `.env*` files - Updates session configuration for security and scalability
+
 <a name="command-options"></a>
 
 ## Command Options
@@ -208,6 +213,17 @@ The package copies pre-configured files to your project, organized by purpose:
 <a name="additional-features"></a>
 
 ## Additional Features
+
+<a name="session-configuration"></a>
+
+### Session Configuration
+
+Laravel defaults to storing sessions in the database, which requires a migration and adds database overhead for every request. Laravel Mise updates your environment files to use encrypted cookie sessions instead:
+
+- `SESSION_DRIVER=cookie` — Stores session data in encrypted cookies (no database queries)
+- `SESSION_ENCRYPT=true` — Encrypts session data for security
+
+This change applies to all `.env*` files in your project (`.env`, `.env.example`, `.env.testing`, etc.) to keep them consistent.
 
 <a name="database-migration-alias"></a>
 
