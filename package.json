@@ -1,7 +1,9 @@
 {
-  "devDependencies": {
-    "prettier": "^3.8.0",
-    "prettier-plugin-blade": "^2.1.21",
-    "prettier-plugin-tailwindcss": "^0.7.2"
-  }
+    "devDependencies": {
+        "markdownlint-cli2": "^0.17.2",
+        "prettier": "^3.8.0"
+    },
+    "scripts": {
+        "mdlint": "markdownlint-cli2 '**/*.md' '#node_modules' '#vendor'"
+    }
 }
