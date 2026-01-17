@@ -42,6 +42,15 @@ return [
                 ],
             ],
         ],
+        'loadinglucian/deployer-php' => [
+            'commands' => [
+                ['vendor/bin/deployer', 'scaffold:ai'],
+                ['vendor/bin/deployer', 'scaffold:crons'],
+                ['vendor/bin/deployer', 'scaffold:hooks'],
+                ['vendor/bin/deployer', 'scaffold:supervisors'],
+                ['vendor/bin/deployer', 'scaffold:workflows'],
+            ],
+        ],
         'barryvdh/laravel-debugbar' => [
             'commands' => [
                 ['php', 'artisan', 'vendor:publish', '--provider=Barryvdh\Debugbar\ServiceProvider'],
