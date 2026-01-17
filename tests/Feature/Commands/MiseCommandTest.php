@@ -147,4 +147,24 @@ describe('MiseCommand Feature Tests', function (): void {
             $this->assertCommandRan('composer update');
         });
     });
+
+    //
+    // Environment Configuration
+    // ----
+
+    describe('environment configuration', function (): void {
+        it('displays environment files section header', function (): void {
+            // ACT & ASSERT - verify section appears in command output
+            $this->runMise()
+                ->expectsOutputToContain('Updating Environment Files')
+                ->assertSuccessful();
+        });
+
+        it('updates env files when present', function (): void {
+            // ACT & ASSERT - testbench skeleton includes .env.example and .env.testing
+            $this->runMise()
+                ->expectsOutputToContain('Updated')
+                ->assertSuccessful();
+        });
+    });
 });

@@ -34,4 +34,13 @@ describe('MiseServiceProvider Feature Tests', function (): void {
             ->and($registeredCommands['laravel:mise'])
             ->getName()->toBe('laravel:mise');
     });
+
+    it('resolves EnvService as same instance (singleton)', function (): void {
+        // ARRANGE & ACT
+        $instance1 = app(\LaravelMise\Services\EnvService::class);
+        $instance2 = app(\LaravelMise\Services\EnvService::class);
+
+        // ASSERT - singleton means same object reference
+        expect($instance1)->toBe($instance2);
+    });
 });
