@@ -16,7 +16,7 @@
     ],
     "require": {
         "php": "^8.5",
-        "laravel/framework": "^12.40"
+        "laravel/framework": "^12.47"
     },
     "extra": {
         "laravel": {
@@ -30,9 +30,9 @@
         "larastan/larastan": "^3.8",
         "barryvdh/laravel-ide-helper": "^3.6",
         "pestphp/pest": "^4.1",
-        "orchestra/testbench": "^10.8",
+        "orchestra/testbench": "^10.9",
         "pestphp/pest-plugin-laravel": "^4.0",
-        "rector/rector": "^2.2",
+        "rector/rector": "^2.3",
         "roave/security-advisories": "dev-latest"
     },
     "config": {
