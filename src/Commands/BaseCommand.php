@@ -15,7 +15,7 @@ use Illuminate\Console\Command;
  */
 abstract class BaseCommand extends Command
 {
-    private const PACKAGE_NAME = 'loadinglucian/laravel-mise';
+    private const string PACKAGE_NAME = 'loadinglucian/laravel-mise';
 
     // ----
     // Banner

@@ -1,5 +1,5 @@
 name: 'Setup PHP and Composer'
-description: 'Sets up PHP with all required extensions and installs Composer dependencies with caching'
+description: 'Sets up PHP with required extensions and installs Composer dependencies with caching'
 
 inputs:
   php-version:
@@ -21,21 +21,7 @@ runs:
         extensions: dom, curl, libxml, mbstring, zip, sqlite3, json${{ inputs.coverage == 'true' && ', xdebug' || '' }}
         coverage: ${{ inputs.coverage == 'true' && 'xdebug' || 'none' }}
 
-    - name: Get Composer Cache Directory
-      id: composer-cache
-      shell: bash
-      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-    - name: Cache Composer dependencies
-      uses: actions/cache@v4
+    - name: Install Composer dependencies (cached)
+      uses: ramsey/composer-install@v3
       with:
-        path: |
-          vendor
-          ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-php-${{ inputs.php-version }}-composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-${{ inputs.php-version }}-composer-
-
-    - name: Install Composer dependencies
-      shell: bash
-      run: composer install --prefer-dist --no-interaction --no-progress
+        composer-options: --no-interaction --no-progress --prefer-dist
