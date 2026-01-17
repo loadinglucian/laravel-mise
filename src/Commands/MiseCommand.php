@@ -6,6 +6,7 @@ namespace LaravelMise\Commands;
 
 use LaravelMise\Enums\CopyResultEnum;
 use LaravelMise\Services\ComposerJsonService;
+use LaravelMise\Services\EnvService;
 use LaravelMise\Services\NodeDetector;
 use LaravelMise\Services\PayloadService;
 use LaravelMise\Services\ProcessService;
@@ -45,6 +46,7 @@ class MiseCommand extends BaseCommand
         private readonly ComposerJsonService $composerJson,
         private readonly PayloadService $payload,
         private readonly NodeDetector $nodeDetector,
+        private readonly EnvService $env,
     ) {
         parent::__construct();
     }
@@ -128,6 +130,27 @@ class MiseCommand extends BaseCommand
 
         if (! $this->copyFiles()) {
             return self::FAILURE;
+        }
+
+        //
+        // Environment Configuration
+        // ----
+
+        $this->h1('Updating Environment Files');
+
+        $envFiles = $this->env->getEnvFiles(base_path());
+        $sessionConfig = [
+            'SESSION_DRIVER' => 'cookie',
+            'SESSION_ENCRYPT' => 'true',
+        ];
+
+        if (empty($envFiles)) {
+            $this->warning('No .env files found');
+        } else {
+            foreach ($envFiles as $file) {
+                $this->env->updateVariables($file, $sessionConfig);
+                $this->yay('Updated '.basename($file));
+            }
         }
 
         //

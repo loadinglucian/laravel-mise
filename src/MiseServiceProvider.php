@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use LaravelMise\Commands\DbMigrateCommand;
 use LaravelMise\Commands\MiseCommand;
 use LaravelMise\Services\ComposerJsonService;
+use LaravelMise\Services\EnvService;
 use LaravelMise\Services\NodeDetector;
 use LaravelMise\Services\PayloadService;
 use LaravelMise\Services\ProcessService;
@@ -49,5 +50,6 @@ class MiseServiceProvider extends ServiceProvider
         $this->app->singleton(ComposerJsonService::class);
         $this->app->singleton(PayloadService::class);
         $this->app->singleton(NodeDetector::class);
+        $this->app->singleton(EnvService::class);
     }
 }
