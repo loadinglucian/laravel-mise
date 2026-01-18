@@ -57,7 +57,7 @@ composer require --dev loadinglucian/laravel-mise:dev-main
 To install all packages and copy all configuration files, run the mise command:
 
 ```shell
-php artisan laravel:mise
+php artisan mise
 ```
 
 The command installs Composer and NPM packages, copies configuration files to your project, and automatically configures your `composer.json` with useful scripts and settings.
@@ -69,7 +69,7 @@ The command installs Composer and NPM packages, copies configuration files to yo
 If you're setting up a fresh project or want to replace existing configuration files, use the `--force` flag:
 
 ```shell
-php artisan laravel:mise --force
+php artisan mise --force
 ```
 
 > [!WARNING]
@@ -87,7 +87,7 @@ Start with a fresh Laravel project and run the mise command:
 laravel new my-project
 cd my-project
 composer require --dev loadinglucian/laravel-mise:dev-main
-php artisan laravel:mise
+php artisan mise
 ```
 
 The command will:
