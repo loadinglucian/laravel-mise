@@ -30,9 +30,9 @@ describe('MiseServiceProvider Feature Tests', function (): void {
 
         // ASSERT
         expect($registeredCommands)
-            ->toHaveKey('laravel:mise')
-            ->and($registeredCommands['laravel:mise'])
-            ->getName()->toBe('laravel:mise');
+            ->toHaveKey('mise')
+            ->and($registeredCommands['mise'])
+            ->getName()->toBe('mise');
     });
 
     it('resolves EnvService as same instance (singleton)', function (): void {

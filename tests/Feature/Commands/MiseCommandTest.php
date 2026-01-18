@@ -27,7 +27,7 @@ describe('MiseCommand Feature Tests', function (): void {
         $definition = $command->getDefinition();
 
         // ACT & ASSERT
-        expect($command->getName())->toBe('laravel:mise')
+        expect($command->getName())->toBe('mise')
             ->and($definition->getOptions())->toHaveKey('force')
             ->and($definition->getOption('force')->getDefault())->toBeFalse();
     });
