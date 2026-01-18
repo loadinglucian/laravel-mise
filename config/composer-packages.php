@@ -46,6 +46,7 @@ return [
                 ['vendor/bin/deployer', 'scaffold:supervisors'],
                 ['vendor/bin/deployer', 'scaffold:workflows'],
             ],
+            'command_options' => ['destination', 'force'],
         ],
         'barryvdh/laravel-debugbar' => [
             'commands' => [

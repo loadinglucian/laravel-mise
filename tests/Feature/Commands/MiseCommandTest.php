@@ -167,4 +167,44 @@ describe('MiseCommand Feature Tests', function (): void {
                 ->assertSuccessful();
         });
     });
+
+    //
+    // Command Options Injection
+    // ----
+
+    describe('command options injection', function (): void {
+        it('injects destination option when configured', function (): void {
+            // ARRANGE & ACT
+            $this->runMise()
+                ->assertSuccessful();
+
+            // ASSERT
+            $this->assertCommandRan('vendor/bin/test-scaffold init --destination');
+        });
+
+        it('injects force option when configured and --force flag passed', function (): void {
+            // ARRANGE & ACT
+            $this->runMise(['--force' => true])
+                ->assertSuccessful();
+
+            // ASSERT
+            $this->assertCommandRan('vendor/bin/test-scaffold init --destination');
+            $this->assertCommandRan('--force');
+        });
+
+        it('does not inject force option when --force flag not passed', function (): void {
+            // ARRANGE & ACT
+            $this->runMise()
+                ->assertSuccessful();
+
+            // ASSERT - destination should be present, but not force
+            $this->assertCommandRan('vendor/bin/test-scaffold init --destination');
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                // Check specifically for test-scaffold with --force
+                return str_contains($command, 'test-scaffold') && str_contains($command, '--force');
+            });
+        });
+    });
 });
