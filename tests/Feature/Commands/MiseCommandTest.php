@@ -206,5 +206,30 @@ describe('MiseCommand Feature Tests', function (): void {
                 return str_contains($command, 'test-scaffold') && str_contains($command, '--force');
             });
         });
+
+        it('does not inject command options into unrelated post-payload commands', function (): void {
+            // ARRANGE & ACT
+            // test/with-command-options has command_options but NO post_payload_commands
+            // rector/rector has post_payload_commands but NO command_options
+            // Options from test/with-command-options should NOT leak to rector
+            $this->runMise()
+                ->assertSuccessful();
+
+            // ASSERT - rector's post-payload command should NOT have --destination
+            // Use vendor/bin/rector to match the post-payload command, not the package name
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                return str_contains($command, 'vendor/bin/rector') && str_contains($command, '--destination');
+            });
+
+            // ASSERT - pint's post-payload command should NOT have --destination either
+            // Use vendor/bin/pint to match the post-payload command, not the package name
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                return str_contains($command, 'vendor/bin/pint') && str_contains($command, '--destination');
+            });
+        });
     });
 });
