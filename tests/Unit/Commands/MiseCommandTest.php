@@ -11,7 +11,7 @@ describe('MiseCommand Unit Tests', function (): void {
             $command = app()->make(MiseCommand::class);
 
             // ACT & ASSERT
-            expect($command->getName())->toBe('laravel:mise')
+            expect($command->getName())->toBe('mise')
                 ->and($command->getDescription())->toBe('Laravel Mise en Place');
         });
 
