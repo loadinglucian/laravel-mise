@@ -49,6 +49,22 @@ readonly class ComposerJsonService
     }
 
     /**
+     * Check if a package exists in the project's composer.json.
+     */
+    public function hasPackage(string $package, ?string $path = null): bool
+    {
+        $data = $this->read($path);
+        $require = $data['require'] ?? [];
+        $requireDev = $data['require-dev'] ?? [];
+
+        if (! is_array($require) || ! is_array($requireDev)) {
+            return false;
+        }
+
+        return isset($require[$package]) || isset($requireDev[$package]);
+    }
+
+    /**
      * Write data to composer.json with proper formatting.
      *
      * @param  array<mixed>  $data

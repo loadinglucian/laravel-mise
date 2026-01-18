@@ -184,16 +184,26 @@ class MiseCommand extends BaseCommand
             // Package Processing
             // ----
 
-            /** @var string|array<string, array<array<string>>> $v */
+            /** @var string|array<string, array<array<string>>|string> $v */
             foreach ($typePackages as $k => $v) {
                 if (is_string($v)) {
                     $packageNames[] = $v;
                 } else {
+                    //
+                    // Skip packages with unmet requirements
+
+                    if (isset($v['requires'])) {
+                        $requiredPackage = $v['requires'];
+                        if (is_string($requiredPackage) && ! $this->composerJson->hasPackage($requiredPackage)) {
+                            continue;
+                        }
+                    }
+
                     $packageNames[] = (string) $k;
-                    if (isset($v['commands'])) {
+                    if (isset($v['commands']) && is_array($v['commands'])) {
                         $commands = [...$commands, ...$v['commands']];
                     }
-                    if (isset($v['post_payload_commands'])) {
+                    if (isset($v['post_payload_commands']) && is_array($v['post_payload_commands'])) {
                         $this->postPayloadCommands = [...$this->postPayloadCommands, ...$v['post_payload_commands']];
                     }
                 }

@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 return [
     'require' => [
-        'livewire/livewire' => [
-            'commands' => [
-                ['php', 'artisan', 'livewire:publish', '--config'],
-            ],
-        ],
         'livewire/flux' => [
+            'requires' => 'livewire/livewire',
             'post_payload_commands' => [
                 ['php', 'artisan', 'flux:activate'],
             ],
