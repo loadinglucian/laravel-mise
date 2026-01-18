@@ -214,7 +214,11 @@ class MiseCommand extends BaseCommand
                         /** @var array<string> $extractedOptions */
                         $extractedOptions = $v['command_options'];
                         $commandOptions = [...$commandOptions, ...$extractedOptions];
-                        $this->postPayloadCommandOptions = [...$this->postPayloadCommandOptions, ...$extractedOptions];
+                        //
+                        // Only add to post-payload options if this package has post-payload commands
+                        if (isset($v['post_payload_commands']) && is_array($v['post_payload_commands'])) {
+                            $this->postPayloadCommandOptions = [...$this->postPayloadCommandOptions, ...$extractedOptions];
+                        }
                     }
                 }
             }
