@@ -63,6 +63,64 @@ describe('ComposerJsonService', function (): void {
     });
 
     //
+    // hasPackage() tests
+    // ----
+
+    describe('hasPackage()', function (): void {
+        it('returns true when package exists in require', function (): void {
+            // ARRANGE
+            $json = json_encode(['require' => ['livewire/livewire' => '^3.0']]);
+            $this->fs->shouldReceive('exists')->with('/path/composer.json')->andReturn(true);
+            $this->fs->shouldReceive('get')->with('/path/composer.json')->andReturn($json);
+
+            // ACT
+            $result = $this->service->hasPackage('livewire/livewire', '/path/composer.json');
+
+            // ASSERT
+            expect($result)->toBeTrue();
+        });
+
+        it('returns true when package exists in require-dev', function (): void {
+            // ARRANGE
+            $json = json_encode(['require-dev' => ['pestphp/pest' => '^2.0']]);
+            $this->fs->shouldReceive('exists')->with('/path/composer.json')->andReturn(true);
+            $this->fs->shouldReceive('get')->with('/path/composer.json')->andReturn($json);
+
+            // ACT
+            $result = $this->service->hasPackage('pestphp/pest', '/path/composer.json');
+
+            // ASSERT
+            expect($result)->toBeTrue();
+        });
+
+        it('returns false when package not found', function (): void {
+            // ARRANGE
+            $json = json_encode(['require' => ['laravel/framework' => '^11.0']]);
+            $this->fs->shouldReceive('exists')->with('/path/composer.json')->andReturn(true);
+            $this->fs->shouldReceive('get')->with('/path/composer.json')->andReturn($json);
+
+            // ACT
+            $result = $this->service->hasPackage('livewire/livewire', '/path/composer.json');
+
+            // ASSERT
+            expect($result)->toBeFalse();
+        });
+
+        it('returns false when require sections are not arrays', function (): void {
+            // ARRANGE
+            $json = json_encode(['require' => 'invalid', 'require-dev' => null]);
+            $this->fs->shouldReceive('exists')->with('/path/composer.json')->andReturn(true);
+            $this->fs->shouldReceive('get')->with('/path/composer.json')->andReturn($json);
+
+            // ACT
+            $result = $this->service->hasPackage('any/package', '/path/composer.json');
+
+            // ASSERT
+            expect($result)->toBeFalse();
+        });
+    });
+
+    //
     // write() tests
     // ----
 
