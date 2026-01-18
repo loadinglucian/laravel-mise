@@ -37,6 +37,9 @@ class MiseCommand extends BaseCommand
     /** @var array<array<string>> */
     protected array $postPayloadCommands = [];
 
+    /** @var array<string> */
+    protected array $postPayloadCommandOptions = [];
+
     // ----
     // Constructor
     // ----
@@ -158,7 +161,7 @@ class MiseCommand extends BaseCommand
 
         if (! empty($this->postPayloadCommands)) {
             $this->h1('Run the following commands?');
-            $this->execPostPayloadCommands($this->postPayloadCommands);
+            $this->execPostPayloadCommands($this->postPayloadCommands, $this->postPayloadCommandOptions);
         }
 
         return self::SUCCESS;
@@ -178,6 +181,7 @@ class MiseCommand extends BaseCommand
     {
         foreach ($packages as $type => $typePackages) {
             $commands = [];
+            $commandOptions = [];
             $packageNames = [];
 
             //
@@ -206,6 +210,12 @@ class MiseCommand extends BaseCommand
                     if (isset($v['post_payload_commands']) && is_array($v['post_payload_commands'])) {
                         $this->postPayloadCommands = [...$this->postPayloadCommands, ...$v['post_payload_commands']];
                     }
+                    if (isset($v['command_options']) && is_array($v['command_options'])) {
+                        /** @var array<string> $extractedOptions */
+                        $extractedOptions = $v['command_options'];
+                        $commandOptions = [...$commandOptions, ...$extractedOptions];
+                        $this->postPayloadCommandOptions = [...$this->postPayloadCommandOptions, ...$extractedOptions];
+                    }
                 }
             }
 
@@ -219,7 +229,7 @@ class MiseCommand extends BaseCommand
             }
 
             $allCommands = [[...$baseCommand, ...$packageNames], ...$commands];
-            if (! $this->execCommands($allCommands)) {
+            if (! $this->execCommands($allCommands, $commandOptions)) {
                 return false;
             }
 
@@ -263,10 +273,24 @@ class MiseCommand extends BaseCommand
      * Execute multiple commands in sequence.
      *
      * @param  array<array<string>>  $commands
+     * @param  array<string>  $commandOptions
      */
-    protected function execCommands(array $commands): bool
+    protected function execCommands(array $commands, array $commandOptions = []): bool
     {
+        $force = (bool) $this->option('force');
+
         foreach ($commands as $command) {
+            //
+            // Inject dynamic options
+
+            if (in_array('destination', $commandOptions, true)) {
+                $command[] = '--destination';
+                $command[] = base_path();
+            }
+            if (in_array('force', $commandOptions, true) && $force) {
+                $command[] = '--force';
+            }
+
             $this->out('<|gray>$> '.implode(' ', $command).'</>');
             $result = $this->process->run($command);
             if (! $result->successful()) {
@@ -286,15 +310,29 @@ class MiseCommand extends BaseCommand
      * Execute post-payload commands that don't fail the installation.
      *
      * @param  array<array<string>>  $commands
+     * @param  array<string>  $commandOptions
      */
-    protected function execPostPayloadCommands(array $commands): void
+    protected function execPostPayloadCommands(array $commands, array $commandOptions = []): void
     {
         if (empty($commands)) {
             return;
         }
 
+        $force = (bool) $this->option('force');
+
         $this->out('<|gray>Executing all post-payload commands...</>');
         foreach ($commands as $command) {
+            //
+            // Inject dynamic options
+
+            if (in_array('destination', $commandOptions, true)) {
+                $command[] = '--destination';
+                $command[] = base_path();
+            }
+            if (in_array('force', $commandOptions, true) && $force) {
+                $command[] = '--force';
+            }
+
             $this->out('<|gray>$> '.implode(' ', $command).'</>');
             $result = $this->process->run($command);
             if (! $result->successful()) {

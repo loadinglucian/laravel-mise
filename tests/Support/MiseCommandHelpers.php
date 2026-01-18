@@ -106,6 +106,12 @@ trait MiseCommandHelpers
                         ['php', 'artisan', 'ide-helper:meta'],
                     ],
                 ],
+                'test/with-command-options' => [
+                    'commands' => [
+                        ['vendor/bin/test-scaffold', 'init'],
+                    ],
+                    'command_options' => ['destination', 'force'],
+                ],
                 'rector/rector' => [
                     'post_payload_commands' => [
                         ['vendor/bin/rector'],
