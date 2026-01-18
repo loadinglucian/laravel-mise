@@ -25,7 +25,7 @@ class MiseCommand extends BaseCommand
     // Command Definition
     // ----
 
-    protected $signature = 'laravel:mise
+    protected $signature = 'mise
         {--force : Override existing files and skip confirmation prompts}';
 
     protected $description = 'Laravel Mise en Place';
