@@ -4,7 +4,6 @@
 - [Requirements](#requirements)
 - [Installation](#installation)
     - [Install Everything](#install-everything)
-    - [Force Mode](#force-mode)
 - [Quickstart](#quickstart)
 - [What Gets Installed](#what-gets-installed)
     - [Composer Packages](#composer-packages)
@@ -61,19 +60,6 @@ php artisan mise
 ```
 
 The command installs Composer and NPM packages, copies configuration files to your project, and automatically configures your `composer.json` with useful scripts and settings.
-
-<a name="force-mode"></a>
-
-### Force Mode
-
-If you're setting up a fresh project or want to replace existing configuration files, use the `--force` flag:
-
-```shell
-php artisan mise --force
-```
-
-> [!WARNING]
-> Force mode overwrites existing files without confirmation. If you've customized your configuration files (like `phpstan.neon` or `pint.json`), back them up first or your changes will be lost.
 
 <a name="quickstart"></a>
 
@@ -206,9 +192,9 @@ The package copies pre-configured files to your project, organized by purpose:
 
 ## Command Options
 
-| Option    | Description                                           |
-| --------- | ----------------------------------------------------- |
-| `--force` | Override existing files and skip confirmation prompts |
+| Option      | Description                   |
+| ----------- | ----------------------------- |
+| `--yes, -y` | Skip all confirmation prompts |
 
 <a name="additional-features"></a>
 
