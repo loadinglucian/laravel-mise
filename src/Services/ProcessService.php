@@ -12,66 +12,48 @@ use Illuminate\Support\Facades\Process;
 // ----
 //
 // Executes shell commands via Laravel's Process facade.
-// Returns structured results for callers to handle output formatting.
+// Uses TTY mode when available for native terminal output,
+// falls back to output callback in non-TTY environments.
 
 readonly class ProcessService
 {
-    //
-    // Command Execution
-    // ----
-
     /**
-     * Execute a single command.
+     * Execute a command with TTY support and optional output callback.
+     *
+     * Uses TTY mode when available (native terminal output with colors/progress).
+     * Falls back to output callback in non-TTY environments (CI, tests).
      *
      * @param  array<string>  $command
+     * @param  (callable(string): void)|null  $outputCallback
      */
-    public function run(array $command, bool $tty = true): ProcessResult
+    public function run(array $command, ?callable $outputCallback = null): ProcessResult
     {
         $process = Process::command($command);
 
-        if ($tty && 'Windows' !== PHP_OS_FAMILY && ! app()->runningUnitTests()) {
-            $process->tty();
+        // Use TTY when: no callback needed AND environment supports it
+        if ($this->shouldUseTty($outputCallback)) {
+            return $process->tty()->run();
         }
 
-        return $process->run();
+        // Callback mode for non-TTY environments or when caller needs output processing
+        return $process->run(output: $outputCallback === null
+            ? null
+            : fn (string $_type, string $output) => $outputCallback($output)
+        );
     }
 
     /**
-     * Run command with output callback, stripping external '▒ ' prefixes.
+     * Determine if TTY mode should be used.
      *
-     * Preserves ANSI color codes and formatting while removing the prefix.
+     * TTY provides native terminal output (colors, progress bars).
+     * Extracted to allow testing of TTY code path.
      *
-     * @param  array<string>  $command
-     * @param  callable(string): void  $outputCallback
+     * @param  (callable(string): void)|null  $outputCallback
      */
-    public function runWithOutput(array $command, callable $outputCallback): ProcessResult
+    protected function shouldUseTty(?callable $outputCallback): bool
     {
-        return Process::command($command)->run(output: function (string $type, string $output) use ($outputCallback): void {
-            $lines = explode("\n", $output);
-            foreach ($lines as $line) {
-                $outputCallback($this->stripOutputPrefix($line));
-            }
-        });
-    }
-
-    //
-    // Output Processing
-    // ----
-
-    /**
-     * Strip '▒ ' prefix while preserving ANSI color codes.
-     *
-     * Handles patterns like:
-     * - "▒ text" → "text"
-     * - "\e[36m▒ \e[0mtext" → "\e[36m\e[0mtext" (preserves colors)
-     * - "\e[36m▒ text\e[0m" → "\e[36mtext\e[0m" (preserves colors)
-     */
-    private function stripOutputPrefix(string $line): string
-    {
-        // Match: optional leading ANSI codes, then ▒ followed by optional space, then optional ANSI codes
-        // ANSI escape: \e[ or \033[ followed by params and 'm'
-        $pattern = '/^((?:\e\[[0-9;]*m)*)▒ ?((?:\e\[[0-9;]*m)*)/';
-
-        return preg_replace($pattern, '$1$2', $line) ?? $line;
+        return $outputCallback === null
+            && 'Windows' !== PHP_OS_FAMILY
+            && ! app()->runningUnitTests();
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 //
-// ProcessService Unit Tests - Command execution and output processing
+// ProcessService Unit Tests - Command execution with TTY/callback support
 // ----
 
 declare(strict_types=1);
@@ -9,90 +9,81 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Process;
 use LaravelMise\Services\ProcessService;
 
+//
+// Test double that forces TTY mode for testing
+// ----
+
+readonly class TtyEnabledProcessService extends ProcessService
+{
+    #[\Override]
+    protected function shouldUseTty(?callable $outputCallback): bool
+    {
+        // Force TTY mode regardless of environment
+        return $outputCallback === null;
+    }
+}
+
+//
+// Test double that captures TTY decision for verification
+// ----
+
+class TtyDecisionCapture
+{
+    public bool $lastTtyDecision = false;
+}
+
+readonly class TestableProcessService extends ProcessService
+{
+    public function __construct(
+        private TtyDecisionCapture $capture = new TtyDecisionCapture,
+    ) {}
+
+    #[\Override]
+    protected function shouldUseTty(?callable $outputCallback): bool
+    {
+        $this->capture->lastTtyDecision = parent::shouldUseTty($outputCallback);
+
+        return $this->capture->lastTtyDecision;
+    }
+
+    public function getLastTtyDecision(): bool
+    {
+        return $this->capture->lastTtyDecision;
+    }
+}
+
 describe('ProcessService', function (): void {
     beforeEach(function (): void {
         $this->service = new ProcessService;
-
-        // Access private stripOutputPrefix method via reflection
-        $reflection = new ReflectionClass($this->service);
-        $this->stripMethod = $reflection->getMethod('stripOutputPrefix');
     });
 
     //
-    // stripOutputPrefix() tests
+    // shouldUseTty() behavior tests
     // ----
 
-    describe('stripOutputPrefix()', function (): void {
-        describe('basic prefix stripping', function (): void {
-            it('strips ▒ prefix with space from output', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, '▒ text'))
-                    ->toBe('text');
-            });
+    describe('shouldUseTty() behavior', function (): void {
+        it('disables TTY when callback is provided', function (): void {
+            // ARRANGE
+            Process::fake(['*' => Process::result('output', '', 0)]);
+            $testable = new TestableProcessService;
 
-            it('strips ▒ prefix without trailing space', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, '▒text'))
-                    ->toBe('text');
-            });
+            // ACT
+            $testable->run(['echo', 'test'], fn () => null);
 
-            it('converts prefix-only line to empty string', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, '▒ '))
-                    ->toBe('');
-            });
-
-            it('only strips first prefix when nested', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, '▒ ▒ nested'))
-                    ->toBe('▒ nested');
-            });
+            // ASSERT - callback provided means no TTY
+            expect($testable->getLastTtyDecision())->toBeFalse();
         });
 
-        describe('passthrough behavior', function (): void {
-            it('preserves lines without prefix', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, 'normal text'))
-                    ->toBe('normal text');
-            });
+        it('disables TTY during unit tests (even with null callback)', function (): void {
+            // ARRANGE
+            Process::fake(['*' => Process::result('output', '', 0)]);
+            $testable = new TestableProcessService;
 
-            it('preserves empty strings', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, ''))
-                    ->toBe('');
-            });
+            // ACT
+            $testable->run(['echo', 'test'], null);
 
-            it('preserves prefix when not at start of line', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, '  ▒ indented'))
-                    ->toBe('  ▒ indented');
-            });
-        });
-
-        describe('ANSI color preservation', function (): void {
-            it('preserves ANSI codes before and after prefix', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, "\e[36m▒ \e[0mtext"))
-                    ->toBe("\e[36m\e[0mtext");
-            });
-
-            it('preserves wrapping ANSI codes', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, "\e[36m▒ colored text\e[0m"))
-                    ->toBe("\e[36mcolored text\e[0m");
-            });
-
-            it('handles complex ANSI codes with multiple parameters', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, "\e[1;32m▒ bold green"))
-                    ->toBe("\e[1;32mbold green");
-            });
-
-            it('preserves ANSI codes in lines without prefix', function (): void {
-                // ACT & ASSERT
-                expect($this->stripMethod->invoke($this->service, "\e[31mred text\e[0m"))
-                    ->toBe("\e[31mred text\e[0m");
-            });
+            // ASSERT - runningUnitTests() returns true, so TTY is disabled
+            expect($testable->getLastTtyDecision())->toBeFalse();
         });
     });
 
@@ -101,69 +92,74 @@ describe('ProcessService', function (): void {
     // ----
 
     describe('run()', function (): void {
-        it('returns successful process result', function (): void {
-            // ARRANGE
-            Process::fake(['*' => Process::result('output', '', 0)]);
+        describe('without callback (callback mode in tests)', function (): void {
+            it('returns successful process result', function (): void {
+                // ARRANGE
+                Process::fake(['*' => Process::result('output', '', 0)]);
 
-            // ACT
-            $result = $this->service->run(['echo', 'test']);
+                // ACT
+                $result = $this->service->run(['echo', 'test']);
 
-            // ASSERT
-            expect($result->successful())->toBeTrue();
+                // ASSERT
+                expect($result->successful())->toBeTrue();
+            });
+
+            it('returns failed process result', function (): void {
+                // ARRANGE
+                Process::fake(['*' => Process::result('', 'error', 1)]);
+
+                // ACT
+                $result = $this->service->run(['failing', 'command']);
+
+                // ASSERT
+                expect($result->failed())->toBeTrue();
+            });
+
+            it('returns process output', function (): void {
+                // ARRANGE
+                Process::fake(['*' => Process::result('expected output', '', 0)]);
+
+                // ACT
+                $result = $this->service->run(['echo', 'test']);
+
+                // ASSERT
+                expect(trim((string) $result->output()))->toBe('expected output');
+            });
         });
 
-        it('returns failed process result', function (): void {
-            // ARRANGE
-            Process::fake(['*' => Process::result('', 'error', 1)]);
+        describe('with callback (non-TTY mode)', function (): void {
+            it('returns successful process result', function (): void {
+                // ARRANGE
+                Process::fake(['*' => Process::result('output', '', 0)]);
 
-            // ACT
-            $result = $this->service->run(['failing', 'command']);
+                // ACT
+                $result = $this->service->run(['echo', 'test'], fn () => null);
 
-            // ASSERT
-            expect($result->failed())->toBeTrue();
-        });
+                // ASSERT
+                expect($result->successful())->toBeTrue();
+            });
 
-        it('returns process output', function (): void {
-            // ARRANGE
-            Process::fake(['*' => Process::result('expected output', '', 0)]);
+            it('returns failed process result', function (): void {
+                // ARRANGE
+                Process::fake(['*' => Process::result('', 'error', 1)]);
 
-            // ACT
-            $result = $this->service->run(['echo', 'test']);
+                // ACT
+                $result = $this->service->run(['failing', 'command'], fn () => null);
 
-            // ASSERT
-            expect(trim((string) $result->output()))->toBe('expected output');
-        });
-    });
-
-    //
-    // runWithOutput() tests
-    // ----
-
-    describe('runWithOutput()', function (): void {
-        it('returns successful process result', function (): void {
-            // ARRANGE
-            Process::fake(['*' => Process::result('output', '', 0)]);
-
-            // ACT
-            $result = $this->service->runWithOutput(['echo', 'test'], fn () => null);
-
-            // ASSERT
-            expect($result->successful())->toBeTrue();
-        });
-
-        it('returns failed process result', function (): void {
-            // ARRANGE
-            Process::fake(['*' => Process::result('', 'error', 1)]);
-
-            // ACT
-            $result = $this->service->runWithOutput(['failing', 'command'], fn () => null);
-
-            // ASSERT
-            expect($result->failed())->toBeTrue();
+                // ASSERT
+                expect($result->failed())->toBeTrue();
+            });
         });
 
         //
-        // Callback behavior is tested indirectly via stripOutputPrefix() tests.
-        // Process::fake() doesn't invoke output callbacks - it returns results directly.
+        // Note: TTY mode cannot be tested in isolation because:
+        // 1. Process::fake() doesn't intercept the .tty() call - it's set before run()
+        // 2. Even with a test double, Laravel's Process still validates TTY availability
+        // 3. TTY requires /dev/tty which isn't available in CI/test environments
+        //
+        // The TTY code path is validated by:
+        // - shouldUseTty() behavior tests above (verify conditions)
+        // - Manual testing in actual terminal environments
+        // - The test double TtyEnabledProcessService documents the intended behavior
     });
 });

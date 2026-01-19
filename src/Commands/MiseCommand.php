@@ -12,6 +12,7 @@ use LaravelMise\Services\PayloadService;
 use LaravelMise\Services\ProcessService;
 
 use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\pause;
 
 //
 // Mise en Place Command - Laravel Package Installation & Configuration
@@ -27,8 +28,7 @@ class MiseCommand extends BaseCommand
     // Command Definition
     // ----
 
-    protected $signature = 'mise
-        {--y|yes : Skip confirmation prompt}';
+    protected $signature = 'mise {--y|yes : Skip confirmation prompt}';
 
     protected $description = 'Laravel Mise en Place';
 
@@ -66,29 +66,17 @@ class MiseCommand extends BaseCommand
         // ----
 
         if (! $this->option('yes')) {
-            /** @var array<string, array<mixed>> $composerPackages */
-            $composerPackages = config('laravel-mise.composer-packages');
-            /** @var array<string, array<mixed>> $nodePackages */
-            $nodePackages = config('laravel-mise.node-packages');
-
-            $composerCount = $this->countPackages($composerPackages);
-            $nodeCount = $this->countPackages($nodePackages);
-            $fileCount = count($this->payload->getFiles());
-
-            $this->newLine();
-            $this->out('This will install:');
-            $this->out("  • {$composerCount} Composer packages");
-            $this->out("  • {$nodeCount} Node packages");
-            $this->out("  • {$fileCount} configuration files");
-            $this->newLine();
+            $this->out([
+                '',
+                'This will install a number of packages and files. Existing files will be overwritten.',
+                'Make sure your working tree is clean so you can easily revert any changes if needed.',
+            ]);
 
             if (! confirm('Do you want to continue?', default: true)) {
-                $this->out('<|gray>Installation cancelled.</>');
+                $this->info('Installation cancelled.');
 
                 return self::SUCCESS;
             }
-
-            $this->newLine();
         }
 
         //
@@ -97,19 +85,7 @@ class MiseCommand extends BaseCommand
 
         $this->h1('Installing Composer Packages');
 
-        $this->out('<|gray>$> composer update</>');
-        $result = $this->process->runWithOutput(
-            ['composer', 'update'],
-            fn (string $line) => $this->line($line)
-        );
-        if (! $result->successful()) {
-            $this->nay('Failed to run composer update');
-            $this->nay($result->errorOutput());
-
-            return self::FAILURE;
-        }
-
-        $this->newLine();
+        $this->runProcess(['composer', 'update']);
 
         $composerPackages = config('laravel-mise.composer-packages');
 
@@ -120,9 +96,7 @@ class MiseCommand extends BaseCommand
         }
 
         /** @var array<string, array<string|array<string, array<array<string>>|array<string, mixed>>>> $composerPackages */
-        if (! $this->installPackages($composerPackages, ['composer', 'require'], 'require-dev', '--dev')) {
-            return self::FAILURE;
-        }
+        $this->installPackages($composerPackages, ['composer', 'require'], 'require-dev', '--dev');
 
         //
         // Node Package Installation
@@ -133,19 +107,7 @@ class MiseCommand extends BaseCommand
 
         $this->h1("Installing {$label} Packages");
 
-        $updateCommand = $packageManager->updateCommand();
-        $this->out('<|gray>$> '.implode(' ', $updateCommand).'</>');
-        $result = $this->process->runWithOutput(
-            $updateCommand,
-            fn (string $line) => $this->line($line)
-        );
-        if (! $result->successful()) {
-            $this->nay('Failed to run package manager update');
-            $this->nay($result->errorOutput());
-
-            return self::FAILURE;
-        }
-        $this->newLine();
+        $this->runProcess($packageManager->updateCommand());
 
         $nodePackages = config('laravel-mise.node-packages');
 
@@ -156,9 +118,7 @@ class MiseCommand extends BaseCommand
         }
 
         /** @var array<string, array<string|array<string, array<array<string>>|array<string, mixed>>>> $nodePackages */
-        if (! $this->installPackages($nodePackages, $packageManager->installCommand(), 'devDependencies', '--save-dev')) {
-            return self::FAILURE;
-        }
+        $this->installPackages($nodePackages, $packageManager->installCommand(), 'devDependencies', '--save-dev');
 
         //
         // File Operations
@@ -187,7 +147,7 @@ class MiseCommand extends BaseCommand
         } else {
             foreach ($envFiles as $file) {
                 $this->env->updateVariables($file, $sessionConfig);
-                $this->yay('Updated '.basename($file));
+                $this->info('Updated '.basename($file));
             }
         }
 
@@ -195,8 +155,10 @@ class MiseCommand extends BaseCommand
         // Post-Payload Commands
 
         if (! empty($this->postPayloadCommands)) {
-            $this->h1('Run the following commands?');
-            $this->execPostPayloadCommands($this->postPayloadCommands);
+            $this->h1('Running Post-Payload Commands');
+            foreach ($this->postPayloadCommands as $cmdEntry) {
+                $this->runProcesses([$cmdEntry['command']], $cmdEntry['options']);
+            }
         }
 
         return self::SUCCESS;
@@ -234,7 +196,7 @@ class MiseCommand extends BaseCommand
      * @param  array<string, array<string|array<string, array<array<string>>|array<string, mixed>>>>  $packages
      * @param  array<string>  $command
      */
-    protected function installPackages(array $packages, array $command, string $devFlag = '', string $devFlagValue = '--dev'): bool
+    protected function installPackages(array $packages, array $command, string $devFlag = '', string $devFlagValue = '--dev'): void
     {
         foreach ($packages as $type => $typePackages) {
             $packageNames = [];
@@ -302,17 +264,13 @@ class MiseCommand extends BaseCommand
             // Execute package manager command (without command options)
 
             $packageManagerCommand = [...$baseCommand, ...$packageNames];
-            if (! $this->execCommands([$packageManagerCommand])) {
-                return false;
-            }
+            $this->runProcesses([$packageManagerCommand]);
 
             //
             // Execute each package's commands with only that package's options
 
             foreach ($packageCommands as $pkgCmd) {
-                if (! $this->execCommands($pkgCmd['commands'], $pkgCmd['options'])) {
-                    return false;
-                }
+                $this->runProcesses($pkgCmd['commands'], $pkgCmd['options']);
             }
 
             //
@@ -328,14 +286,14 @@ class MiseCommand extends BaseCommand
 
                     $sections = array_keys($composerConfig);
                     $sectionNames = implode(', ', $sections);
-                    $this->out("<|gray>Adding {$packageName} configuration to composer.json ({$sectionNames})...</>");
+                    $this->out("Adding {$packageName} configuration to composer.json ({$sectionNames})...");
 
                     try {
                         $result = $this->composerJson->update($composerConfig);
                         if ($result['updated']) {
-                            $this->yay('Updated composer.json sections: '.implode(', ', $result['sections']));
+                            $this->info('Updated composer.json sections: '.implode(', ', $result['sections']));
                         } else {
-                            $this->out('<|gray>No changes needed for composer.json</>');
+                            $this->out('No changes needed for composer.json');
                         }
                     } catch (\RuntimeException $e) {
                         $this->warning("Failed to update composer.json for {$packageName}: ".$e->getMessage());
@@ -343,8 +301,6 @@ class MiseCommand extends BaseCommand
                 }
             }
         }
-
-        return true;
     }
 
     // ----
@@ -352,12 +308,41 @@ class MiseCommand extends BaseCommand
     // ----
 
     /**
-     * Execute multiple commands in sequence.
+     * Execute a single command with output streaming.
+     *
+     * Displays the command, runs it, and on failure shows error + pauses.
+     *
+     * @param  array<string>  $command
+     */
+    protected function runProcess(array $command): void
+    {
+        $this->out('$> '.implode(' ', $command));
+        $result = $this->process->run(
+            $command,
+            fn (string $output) => $this->output->write($output)
+        );
+
+        if (! $result->successful()) {
+            $errorOutput = $result->errorOutput();
+            if ($errorOutput) {
+                $this->nay($errorOutput);
+            } else {
+                $this->nay('Failed to run command');
+            }
+
+            if (! app()->runningUnitTests()) {
+                pause('Press ENTER to continue.');
+            }
+        }
+    }
+
+    /**
+     * Execute multiple commands with optional dynamic options.
      *
      * @param  array<array<string>>  $commands
      * @param  array<string>  $commandOptions
      */
-    protected function execCommands(array $commands, array $commandOptions = []): bool
+    protected function runProcesses(array $commands, array $commandOptions = []): void
     {
         foreach ($commands as $command) {
             //
@@ -367,67 +352,12 @@ class MiseCommand extends BaseCommand
                 $command[] = '--destination';
                 $command[] = base_path();
             }
+
             if (in_array('force', $commandOptions, true)) {
                 $command[] = '--force';
             }
 
-            $this->out('<|gray>$> '.implode(' ', $command).'</>');
-            $result = $this->process->runWithOutput(
-                $command,
-                fn (string $line) => $this->line($line)
-            );
-            if (! $result->successful()) {
-                if (! defined('PHPUNIT_COMPOSER_INSTALL')) {
-                    $this->nay('Failed to run command');
-                    $this->nay($result->errorOutput());
-                }
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Execute post-payload commands that don't fail the installation.
-     *
-     * @param  array<array{command: array<string>, options: array<string>}>  $commands
-     */
-    protected function execPostPayloadCommands(array $commands): void
-    {
-        if (empty($commands)) {
-            return;
-        }
-
-        $this->out('<|gray>Executing all post-payload commands...</>');
-        foreach ($commands as $cmdEntry) {
-            $command = $cmdEntry['command'];
-            $commandOptions = $cmdEntry['options'];
-
-            //
-            // Inject dynamic options
-
-            if (in_array('destination', $commandOptions, true)) {
-                $command[] = '--destination';
-                $command[] = base_path();
-            }
-            if (in_array('force', $commandOptions, true)) {
-                $command[] = '--force';
-            }
-
-            $this->out('<|gray>$> '.implode(' ', $command).'</>');
-            $result = $this->process->runWithOutput(
-                $command,
-                fn (string $line) => $this->line($line)
-            );
-            if (! $result->successful()) {
-                $this->out('<|gray>Post-payload command failed: '.implode(' ', $command).'</>');
-                if ($result->errorOutput()) {
-                    $this->out('<|gray>'.$result->errorOutput().'</>');
-                }
-                $this->out('<|gray>Continuing...</>');
-            }
+            $this->runProcess($command);
         }
     }
 
@@ -457,24 +387,5 @@ class MiseCommand extends BaseCommand
 
             return false;
         }
-    }
-
-    // ----
-    // Utility Methods
-    // ----
-
-    /**
-     * Count total packages across all sections.
-     *
-     * @param  array<string, array<mixed>>  $packages
-     */
-    protected function countPackages(array $packages): int
-    {
-        $count = 0;
-        foreach ($packages as $typePackages) {
-            $count += count($typePackages);
-        }
-
-        return $count;
     }
 }

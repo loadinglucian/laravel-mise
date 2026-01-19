@@ -45,12 +45,11 @@ describe('MiseCommand Feature Tests', function (): void {
     // ----
 
     describe('confirmation prompt', function (): void {
-        it('displays package and file counts before confirmation', function (): void {
+        it('displays warning message before confirmation', function (): void {
             // ARRANGE & ACT
             $this->runMise(['--yes' => false])
-                ->expectsOutputToContain('Composer packages')
-                ->expectsOutputToContain('Node packages')
-                ->expectsOutputToContain('configuration files')
+                ->expectsOutputToContain('This will install a number of packages and files')
+                ->expectsOutputToContain('working tree is clean')
                 ->expectsConfirmation('Do you want to continue?', 'yes')
                 ->assertSuccessful();
         });
@@ -132,20 +131,33 @@ describe('MiseCommand Feature Tests', function (): void {
                 ->assertFailed();
         });
 
-        it('fails when composer update fails', function (): void {
+        it('continues when composer update fails (soft error)', function (): void {
             // ARRANGE
-            Process::fake(['*' => Process::result('', 'Network error', 1)]);
+            Process::fake([
+                '*' => function (PendingProcess $process) {
+                    $command = $this->extractCommand($process);
+
+                    // Only composer update fails
+                    if (str_contains($command, 'composer update')) {
+                        return Process::result('', 'Network error', 1);
+                    }
+
+                    return Process::result('', '', 0);
+                },
+            ]);
 
             // ACT
             $this->runMise()
                 ->expectsOutputToContain('Installing Composer Packages')
-                ->assertFailed();
+                ->expectsOutputToContain('Network error')
+                ->assertSuccessful();
 
-            // ASSERT
+            // ASSERT - composer update ran and subsequent commands still executed
             $this->assertCommandRan('composer update');
+            $this->assertCommandRan('composer require');
         });
 
-        it('fails when npm update fails', function (): void {
+        it('continues when npm update fails (soft error)', function (): void {
             // ARRANGE
             Process::fake([
                 '*' => function (PendingProcess $process) {
@@ -167,7 +179,8 @@ describe('MiseCommand Feature Tests', function (): void {
 
             // ACT
             $this->runMise()
-                ->assertFailed();
+                ->expectsOutputToContain('npm error')
+                ->assertSuccessful();
         });
 
         it('handles process with stderr but success exit code', function (): void {
@@ -182,6 +195,27 @@ describe('MiseCommand Feature Tests', function (): void {
 
             // ASSERT
             $this->assertCommandRan('composer update');
+        });
+
+        it('displays generic error when no error output available', function (): void {
+            // ARRANGE
+            Process::fake([
+                '*' => function (PendingProcess $process) {
+                    $command = $this->extractCommand($process);
+
+                    // Command fails with empty error output
+                    if (str_contains($command, 'composer update')) {
+                        return Process::result('', '', 1);
+                    }
+
+                    return Process::result('', '', 0);
+                },
+            ]);
+
+            // ACT
+            $this->runMise()
+                ->expectsOutputToContain('Failed to run command')
+                ->assertSuccessful();
         });
     });
 

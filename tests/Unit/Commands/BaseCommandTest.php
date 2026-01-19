@@ -36,11 +36,6 @@ class TestableCommand extends BaseCommand
         $this->h1($text);
     }
 
-    public function callH2(string $text): void
-    {
-        $this->h2($text);
-    }
-
     public function callYay(string $message): void
     {
         $this->yay($message);
@@ -56,27 +51,9 @@ class TestableCommand extends BaseCommand
         $this->warning($message);
     }
 
-    public function callNotice(string $message): void
+    public function callBanner(): void
     {
-        $this->notice($message);
-    }
-
-    public function callUl(string|iterable $lines): void
-    {
-        $this->ul($lines);
-    }
-
-    public function callOl(string|iterable $lines): void
-    {
-        $this->ol($lines);
-    }
-
-    /**
-     * @param  array<int|string, mixed>  $details
-     */
-    public function callDisplayDeets(array $details, bool $ul = false): void
-    {
-        $this->displayDeets($details, $ul);
+        $this->banner();
     }
 }
 
@@ -181,20 +158,6 @@ describe('structural elements', function (): void {
             ->and($result)->toContain('▒ # Main Title')
             ->and($result)->toContain('────────────────────────');
     });
-
-    it('h2 outputs heading with dynamic underline', function (): void {
-        // ARRANGE
-        [$command, $output] = createCommandWithOutput();
-
-        // ACT
-        $command->callH2('Subtitle');
-
-        // ASSERT
-        $result = $output->fetch();
-        $lines = explode("\n", trim($result));
-        expect($lines[0])->toBe('▒ ## Subtitle')
-            ->and(mb_strlen($lines[1]))->toBe(mb_strlen($lines[0])); // Underline matches heading length
-    });
 });
 
 describe('status messages', function (): void {
@@ -232,125 +195,44 @@ describe('status messages', function (): void {
         // ASSERT
         expect($output->fetch())->toBe("▒ ! Be careful\n");
     });
-
-    it('notice outputs info symbol prefix', function (): void {
-        // ARRANGE
-        [$command, $output] = createCommandWithOutput();
-
-        // ACT
-        $command->callNotice('Informational message');
-
-        // ASSERT
-        expect($output->fetch())->toBe("▒ ℹ Informational message\n");
-    });
 });
 
-describe('list formatting', function (): void {
-    it('ul adds bullet points to array', function (): void {
+describe('banner()', function (): void {
+    it('outputs application name and version', function (): void {
         // ARRANGE
         [$command, $output] = createCommandWithOutput();
 
         // ACT
-        $command->callUl(['Item one', 'Item two', 'Item three']);
+        $command->callBanner();
 
         // ASSERT
-        expect($output->fetch())->toBe("▒ • Item one\n▒ • Item two\n▒ • Item three\n");
-    });
-
-    it('ul handles single string', function (): void {
-        // ARRANGE
-        [$command, $output] = createCommandWithOutput();
-
-        // ACT
-        $command->callUl('Single item');
-
-        // ASSERT
-        expect($output->fetch())->toBe("▒ • Single item\n");
-    });
-
-    it('ol adds sequential numbers', function (): void {
-        // ARRANGE
-        [$command, $output] = createCommandWithOutput();
-
-        // ACT
-        $command->callOl(['First', 'Second', 'Third']);
-
-        // ASSERT
-        expect($output->fetch())->toBe("▒ 1. First\n▒ 2. Second\n▒ 3. Third\n");
-    });
-
-    it('ol handles single string', function (): void {
-        // ARRANGE
-        [$command, $output] = createCommandWithOutput();
-
-        // ACT
-        $command->callOl('Only item');
-
-        // ASSERT
-        expect($output->fetch())->toBe("▒ 1. Only item\n");
-    });
-});
-
-describe('displayDeets()', function (): void {
-    it('returns early for empty array', function (): void {
-        // ARRANGE
-        [$command, $output] = createCommandWithOutput();
-
-        // ACT
-        $command->callDisplayDeets([]);
-
-        // ASSERT
-        expect($output->fetch())->toBe('');
-    });
-
-    it('aligns keys based on longest key', function (): void {
-        // ARRANGE
-        [$command, $output] = createCommandWithOutput();
-
-        // ACT
-        $command->callDisplayDeets([
-            'short' => 'value1',
-            'longerkey' => 'value2',
-        ]);
-
-        // ASSERT - values are displayed with gray color
         $result = $output->fetch();
-        expect($result)->toContain('short:    ')
-            ->and($result)->toContain('longerkey:')
-            ->and($result)->toContain('value1')
-            ->and($result)->toContain('value2')
-            ->and($result)->toContain("\033[90m"); // ANSI gray for values
+        expect($result)->toContain('Laravel Mise')
+            ->and($result)->toContain('Ver:');
     });
 
-    it('handles nested arrays recursively', function (): void {
+    it('outputs decorated header line with gradient colors', function (): void {
         // ARRANGE
         [$command, $output] = createCommandWithOutput();
 
         // ACT
-        $command->callDisplayDeets([
-            'parent' => [
-                'child1' => 'nested1',
-                'child2' => 'nested2',
-            ],
-        ]);
+        $command->callBanner();
 
-        // ASSERT - nested items have bullet prefix and gray values
+        // ASSERT - check for the decorative header structure
         $result = $output->fetch();
-        expect($result)->toContain('▒ parent:')
-            ->and($result)->toContain('• child1:')
-            ->and($result)->toContain('nested1')
-            ->and($result)->toContain('• child2:')
-            ->and($result)->toContain('nested2');
+        expect($result)->toContain('▒ ≡')
+            ->and($result)->toContain('━');
     });
 
-    it('adds bullet prefix when ul flag is true', function (): void {
+    it('displays version string from composer or dev fallback', function (): void {
         // ARRANGE
         [$command, $output] = createCommandWithOutput();
 
         // ACT
-        $command->callDisplayDeets(['key' => 'value'], true);
+        $command->callBanner();
 
-        // ASSERT
-        expect($output->fetch())->toContain('▒ • key:');
+        // ASSERT - version is either a semver (x.y.z) or 'dev' fallback
+        $result = $output->fetch();
+        expect($result)->toMatch('/Ver: (dev|\d+\.\d+\.\d+)/');
     });
 });
