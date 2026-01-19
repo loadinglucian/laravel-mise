@@ -27,7 +27,7 @@
     },
     "require-dev": {
         "laravel/pint": "^1.27",
-        "larastan/larastan": "^3.8",
+        "larastan/larastan": "^3.9",
         "pestphp/pest": "^4.1",
         "orchestra/testbench": "^10.9",
         "pestphp/pest-plugin-laravel": "^4.0",
