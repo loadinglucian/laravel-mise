@@ -34,11 +34,8 @@ class MiseCommand extends BaseCommand
     // Post-Payload Commands Collection
     // ----
 
-    /** @var array<array<string>> */
+    /** @var array<array{command: array<string>, options: array<string>}> */
     protected array $postPayloadCommands = [];
-
-    /** @var array<string> */
-    protected array $postPayloadCommandOptions = [];
 
     // ----
     // Constructor
@@ -161,7 +158,7 @@ class MiseCommand extends BaseCommand
 
         if (! empty($this->postPayloadCommands)) {
             $this->h1('Run the following commands?');
-            $this->execPostPayloadCommands($this->postPayloadCommands, $this->postPayloadCommandOptions);
+            $this->execPostPayloadCommands($this->postPayloadCommands);
         }
 
         return self::SUCCESS;
@@ -172,6 +169,28 @@ class MiseCommand extends BaseCommand
     // ----
 
     /**
+     * Extract command options from package configuration.
+     *
+     * @param  array<string, mixed>  $packageConfig
+     * @return array<string>
+     */
+    protected function extractOptions(array $packageConfig): array
+    {
+        /** @var array<string> $options */
+        $options = [];
+
+        if (isset($packageConfig['command_options']) && is_array($packageConfig['command_options'])) {
+            foreach ($packageConfig['command_options'] as $option) {
+                if (is_string($option)) {
+                    $options[] = $option;
+                }
+            }
+        }
+
+        return $options;
+    }
+
+    /**
      * Install packages and handle their configurations.
      *
      * @param  array<string, array<string|array<string, array<array<string>>|array<string, mixed>>>>  $packages
@@ -180,9 +199,10 @@ class MiseCommand extends BaseCommand
     protected function installPackages(array $packages, array $command, string $devFlag = '', string $devFlagValue = '--dev'): bool
     {
         foreach ($packages as $type => $typePackages) {
-            $commands = [];
-            $commandOptions = [];
             $packageNames = [];
+
+            /** @var array<array{commands: array<array<string>>, options: array<string>}> */
+            $packageCommands = [];
 
             //
             // Package Processing
@@ -204,20 +224,28 @@ class MiseCommand extends BaseCommand
                     }
 
                     $packageNames[] = (string) $k;
+
+                    //
+                    // Collect package commands with their specific options
+
                     if (isset($v['commands']) && is_array($v['commands'])) {
-                        $commands = [...$commands, ...$v['commands']];
+                        $packageOptions = $this->extractOptions($v);
+                        $packageCommands[] = [
+                            'commands' => $v['commands'],
+                            'options' => $packageOptions,
+                        ];
                     }
+
+                    //
+                    // Collect post-payload commands with their specific options
+
                     if (isset($v['post_payload_commands']) && is_array($v['post_payload_commands'])) {
-                        $this->postPayloadCommands = [...$this->postPayloadCommands, ...$v['post_payload_commands']];
-                    }
-                    if (isset($v['command_options']) && is_array($v['command_options'])) {
-                        /** @var array<string> $extractedOptions */
-                        $extractedOptions = $v['command_options'];
-                        $commandOptions = [...$commandOptions, ...$extractedOptions];
-                        //
-                        // Only add to post-payload options if this package has post-payload commands
-                        if (isset($v['post_payload_commands']) && is_array($v['post_payload_commands'])) {
-                            $this->postPayloadCommandOptions = [...$this->postPayloadCommandOptions, ...$extractedOptions];
+                        $packageOptions = $this->extractOptions($v);
+                        foreach ($v['post_payload_commands'] as $postCmd) {
+                            $this->postPayloadCommands[] = [
+                                'command' => $postCmd,
+                                'options' => $packageOptions,
+                            ];
                         }
                     }
                 }
@@ -241,10 +269,10 @@ class MiseCommand extends BaseCommand
             }
 
             //
-            // Execute package-specific commands (with command options)
+            // Execute each package's commands with only that package's options
 
-            if (! empty($commands)) {
-                if (! $this->execCommands($commands, $commandOptions)) {
+            foreach ($packageCommands as $pkgCmd) {
+                if (! $this->execCommands($pkgCmd['commands'], $pkgCmd['options'])) {
                     return false;
                 }
             }
@@ -325,10 +353,9 @@ class MiseCommand extends BaseCommand
     /**
      * Execute post-payload commands that don't fail the installation.
      *
-     * @param  array<array<string>>  $commands
-     * @param  array<string>  $commandOptions
+     * @param  array<array{command: array<string>, options: array<string>}>  $commands
      */
-    protected function execPostPayloadCommands(array $commands, array $commandOptions = []): void
+    protected function execPostPayloadCommands(array $commands): void
     {
         if (empty($commands)) {
             return;
@@ -337,7 +364,10 @@ class MiseCommand extends BaseCommand
         $force = (bool) $this->option('force');
 
         $this->out('<|gray>Executing all post-payload commands...</>');
-        foreach ($commands as $command) {
+        foreach ($commands as $cmdEntry) {
+            $command = $cmdEntry['command'];
+            $commandOptions = $cmdEntry['options'];
+
             //
             // Inject dynamic options
 
