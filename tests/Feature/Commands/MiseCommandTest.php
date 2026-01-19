@@ -231,5 +231,24 @@ describe('MiseCommand Feature Tests', function (): void {
                 return str_contains($command, 'vendor/bin/pint') && str_contains($command, '--destination');
             });
         });
+
+        it('does not inject command options into package manager commands', function (): void {
+            // ARRANGE & ACT
+            $this->runMise()->assertSuccessful();
+
+            // ASSERT - composer require should NOT have --destination
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                return str_contains($command, 'composer require') && str_contains($command, '--destination');
+            });
+
+            // ASSERT - npm install should NOT have --destination
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                return str_contains($command, 'npm install') && str_contains($command, '--destination');
+            });
+        });
     });
 });
