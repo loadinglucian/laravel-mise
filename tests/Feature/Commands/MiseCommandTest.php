@@ -250,5 +250,33 @@ describe('MiseCommand Feature Tests', function (): void {
                 return str_contains($command, 'npm install') && str_contains($command, '--destination');
             });
         });
+
+        it('does not inject command options into other packages commands', function (): void {
+            // ARRANGE & ACT
+            // barryvdh/laravel-ide-helper has commands but NO command_options
+            // test/with-command-options has commands WITH command_options
+            // Options from test/with-command-options should NOT leak to ide-helper
+            $this->runMise()->assertSuccessful();
+
+            // ASSERT - ide-helper commands should NOT have --destination
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                return str_contains($command, 'ide-helper:generate') && str_contains($command, '--destination');
+            });
+
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                return str_contains($command, 'ide-helper:meta') && str_contains($command, '--destination');
+            });
+
+            // ASSERT - livewire:publish should NOT have --destination
+            Process::assertDidntRun(function (PendingProcess $process) {
+                $command = $this->extractCommand($process);
+
+                return str_contains($command, 'livewire:publish') && str_contains($command, '--destination');
+            });
+        });
     });
 });
