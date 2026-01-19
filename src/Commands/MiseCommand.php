@@ -11,6 +11,8 @@ use LaravelMise\Services\NodeDetector;
 use LaravelMise\Services\PayloadService;
 use LaravelMise\Services\ProcessService;
 
+use function Laravel\Prompts\confirm;
+
 //
 // Mise en Place Command - Laravel Package Installation & Configuration
 // ----
@@ -26,7 +28,7 @@ class MiseCommand extends BaseCommand
     // ----
 
     protected $signature = 'mise
-        {--force : Override existing files and skip confirmation prompts}';
+        {--y|yes : Skip confirmation prompt}';
 
     protected $description = 'Laravel Mise en Place';
 
@@ -60,13 +62,46 @@ class MiseCommand extends BaseCommand
         $this->banner();
 
         //
+        // Confirmation Prompt
+        // ----
+
+        if (! $this->option('yes')) {
+            /** @var array<string, array<mixed>> $composerPackages */
+            $composerPackages = config('laravel-mise.composer-packages');
+            /** @var array<string, array<mixed>> $nodePackages */
+            $nodePackages = config('laravel-mise.node-packages');
+
+            $composerCount = $this->countPackages($composerPackages);
+            $nodeCount = $this->countPackages($nodePackages);
+            $fileCount = count($this->payload->getFiles());
+
+            $this->newLine();
+            $this->out('This will install:');
+            $this->out("  • {$composerCount} Composer packages");
+            $this->out("  • {$nodeCount} Node packages");
+            $this->out("  • {$fileCount} configuration files");
+            $this->newLine();
+
+            if (! confirm('Do you want to continue?', default: true)) {
+                $this->out('<|gray>Installation cancelled.</>');
+
+                return self::SUCCESS;
+            }
+
+            $this->newLine();
+        }
+
+        //
         // Composer Package Installation
         // ----
 
         $this->h1('Installing Composer Packages');
 
         $this->out('<|gray>$> composer update</>');
-        $result = $this->process->run(['composer', 'update']);
+        $result = $this->process->runWithOutput(
+            ['composer', 'update'],
+            fn (string $line) => $this->line($line)
+        );
         if (! $result->successful()) {
             $this->nay('Failed to run composer update');
             $this->nay($result->errorOutput());
@@ -100,7 +135,10 @@ class MiseCommand extends BaseCommand
 
         $updateCommand = $packageManager->updateCommand();
         $this->out('<|gray>$> '.implode(' ', $updateCommand).'</>');
-        $result = $this->process->run($updateCommand);
+        $result = $this->process->runWithOutput(
+            $updateCommand,
+            fn (string $line) => $this->line($line)
+        );
         if (! $result->successful()) {
             $this->nay('Failed to run package manager update');
             $this->nay($result->errorOutput());
@@ -321,8 +359,6 @@ class MiseCommand extends BaseCommand
      */
     protected function execCommands(array $commands, array $commandOptions = []): bool
     {
-        $force = (bool) $this->option('force');
-
         foreach ($commands as $command) {
             //
             // Inject dynamic options
@@ -331,12 +367,15 @@ class MiseCommand extends BaseCommand
                 $command[] = '--destination';
                 $command[] = base_path();
             }
-            if (in_array('force', $commandOptions, true) && $force) {
+            if (in_array('force', $commandOptions, true)) {
                 $command[] = '--force';
             }
 
             $this->out('<|gray>$> '.implode(' ', $command).'</>');
-            $result = $this->process->run($command);
+            $result = $this->process->runWithOutput(
+                $command,
+                fn (string $line) => $this->line($line)
+            );
             if (! $result->successful()) {
                 if (! defined('PHPUNIT_COMPOSER_INSTALL')) {
                     $this->nay('Failed to run command');
@@ -361,8 +400,6 @@ class MiseCommand extends BaseCommand
             return;
         }
 
-        $force = (bool) $this->option('force');
-
         $this->out('<|gray>Executing all post-payload commands...</>');
         foreach ($commands as $cmdEntry) {
             $command = $cmdEntry['command'];
@@ -375,12 +412,15 @@ class MiseCommand extends BaseCommand
                 $command[] = '--destination';
                 $command[] = base_path();
             }
-            if (in_array('force', $commandOptions, true) && $force) {
+            if (in_array('force', $commandOptions, true)) {
                 $command[] = '--force';
             }
 
             $this->out('<|gray>$> '.implode(' ', $command).'</>');
-            $result = $this->process->run($command);
+            $result = $this->process->runWithOutput(
+                $command,
+                fn (string $line) => $this->line($line)
+            );
             if (! $result->successful()) {
                 $this->out('<|gray>Post-payload command failed: '.implode(' ', $command).'</>');
                 if ($result->errorOutput()) {
@@ -401,8 +441,7 @@ class MiseCommand extends BaseCommand
     protected function copyFiles(): bool
     {
         try {
-            $force = (bool) $this->option('force');
-            $results = $this->payload->copyAll($force);
+            $results = $this->payload->copyAll(force: true);
 
             foreach ($results as $relativePath => $result) {
                 match ($result) {
@@ -418,5 +457,24 @@ class MiseCommand extends BaseCommand
 
             return false;
         }
+    }
+
+    // ----
+    // Utility Methods
+    // ----
+
+    /**
+     * Count total packages across all sections.
+     *
+     * @param  array<string, array<mixed>>  $packages
+     */
+    protected function countPackages(array $packages): int
+    {
+        $count = 0;
+        foreach ($packages as $typePackages) {
+            $count += count($typePackages);
+        }
+
+        return $count;
     }
 }

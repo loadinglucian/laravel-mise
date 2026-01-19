@@ -29,8 +29,9 @@ abstract class BaseCommand extends Command
         $version = $this->getPackageVersion();
 
         $this->line('');
-        $this->line('<fg=cyan;options=bold>▒ Laravel </><fg=blue;options=bold>Mise</> '.$version.' <fg=magenta>•</> Everything ready to start cooking!');
-        $this->line('<fg=cyan;options=bold>▒ ━━━━━━━━━━━━</><fg=blue>━━━━━━━━━━━━</><fg=bright-blue>━━━━━━━━━━━━</><fg=magenta>━━━━━━━━━━━━</><fg=gray>━━━━━━━━━━━━</>');
+        $this->line('<fg=cyan>▒ ≡</> <fg=cyan;options=bold>Laravel Mise</> <fg=cyan>━━━━━━━━━━━━━━━━</><fg=bright-blue>━━━━━━━━━━━━━━━</><fg=magenta>━━━━━━━━━━━━━━━</><fg=gray>━━━━━━━━━━━━━━━━</>');
+        $this->line('<fg=gray>▒ </>');
+        $this->line('<fg=gray>▒ Ver: '.$version.'</>');
     }
 
     /**

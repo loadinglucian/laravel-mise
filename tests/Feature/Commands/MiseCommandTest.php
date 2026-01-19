@@ -24,12 +24,9 @@ describe('MiseCommand Feature Tests', function (): void {
     it('has correct command signature', function (): void {
         // ARRANGE
         $command = app()->make(MiseCommand::class);
-        $definition = $command->getDefinition();
 
         // ACT & ASSERT
-        expect($command->getName())->toBe('mise')
-            ->and($definition->getOptions())->toHaveKey('force')
-            ->and($definition->getOption('force')->getDefault())->toBeFalse();
+        expect($command->getName())->toBe('mise');
     });
 
     it('runs all installation phases', function (): void {
@@ -44,6 +41,53 @@ describe('MiseCommand Feature Tests', function (): void {
     });
 
     //
+    // Confirmation Prompt
+    // ----
+
+    describe('confirmation prompt', function (): void {
+        it('displays package and file counts before confirmation', function (): void {
+            // ARRANGE & ACT
+            $this->runMise(['--yes' => false])
+                ->expectsOutputToContain('Composer packages')
+                ->expectsOutputToContain('Node packages')
+                ->expectsOutputToContain('configuration files')
+                ->expectsConfirmation('Do you want to continue?', 'yes')
+                ->assertSuccessful();
+        });
+
+        it('exits successfully when user cancels confirmation', function (): void {
+            // ARRANGE & ACT
+            $this->runMise(['--yes' => false])
+                ->expectsConfirmation('Do you want to continue?', 'no')
+                ->expectsOutputToContain('Installation cancelled')
+                ->assertSuccessful();
+
+            // ASSERT - no commands were run
+            Process::assertNothingRan();
+        });
+
+        it('continues installation when user confirms', function (): void {
+            // ARRANGE & ACT
+            $this->runMise(['--yes' => false])
+                ->expectsConfirmation('Do you want to continue?', 'yes')
+                ->expectsOutputToContain('Installing Composer Packages')
+                ->assertSuccessful();
+
+            // ASSERT
+            $this->assertCommandRan('composer update');
+        });
+
+        it('skips confirmation when --yes flag provided', function (): void {
+            // ARRANGE & ACT (default behavior via helper)
+            $this->runMise()
+                ->assertSuccessful();
+
+            // ASSERT - commands ran without confirmation prompt
+            $this->assertCommandRan('composer update');
+        });
+    });
+
+    //
     // File Operations
     // ----
 
@@ -52,17 +96,10 @@ describe('MiseCommand Feature Tests', function (): void {
             Storage::fake('local');
         });
 
-        it('copies files with force option', function (): void {
+        it('copies files and always overwrites', function (): void {
             // ARRANGE
             Storage::put('test-config.txt', 'original content');
 
-            // ACT
-            $this->runMise(['--force' => true])
-                ->expectsOutputToContain('Copying files')
-                ->assertSuccessful();
-        });
-
-        it('copies files without force option', function (): void {
             // ACT
             $this->runMise()
                 ->expectsOutputToContain('Copying files')
@@ -182,29 +219,14 @@ describe('MiseCommand Feature Tests', function (): void {
             $this->assertCommandRan('vendor/bin/test-scaffold init --destination');
         });
 
-        it('injects force option when configured and --force flag passed', function (): void {
+        it('injects force option when configured', function (): void {
             // ARRANGE & ACT
-            $this->runMise(['--force' => true])
+            $this->runMise()
                 ->assertSuccessful();
 
             // ASSERT
             $this->assertCommandRan('vendor/bin/test-scaffold init --destination');
             $this->assertCommandRan('--force');
-        });
-
-        it('does not inject force option when --force flag not passed', function (): void {
-            // ARRANGE & ACT
-            $this->runMise()
-                ->assertSuccessful();
-
-            // ASSERT - destination should be present, but not force
-            $this->assertCommandRan('vendor/bin/test-scaffold init --destination');
-            Process::assertDidntRun(function (PendingProcess $process) {
-                $command = $this->extractCommand($process);
-
-                // Check specifically for test-scaffold with --force
-                return str_contains($command, 'test-scaffold') && str_contains($command, '--force');
-            });
         });
 
         it('does not inject command options into unrelated post-payload commands', function (): void {

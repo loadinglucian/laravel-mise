@@ -117,10 +117,10 @@ arch()
 
 // For conditional tests that require complex logic, we keep traditional test format
 it('controllers extend base controller when it exists', function (): void {
-    if (class_exists('App\Http\Controllers\Controller')) {
+    if (class_exists(\App\Http\Controllers\Controller::class)) {
         arch()
             ->expect('App\Http\Controllers')
-            ->toExtend('App\Http\Controllers\Controller');
+            ->toExtend(\App\Http\Controllers\Controller::class);
     } else {
         expect(true)->toBeTrue(); // Skip if base controller doesn't exist
     }
