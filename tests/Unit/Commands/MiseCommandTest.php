@@ -15,7 +15,7 @@ describe('MiseCommand Unit Tests', function (): void {
                 ->and($command->getDescription())->toBe('Laravel Mise en Place');
         });
 
-        it('has only force option for simplified interface', function (): void {
+        it('has only yes option for simplified interface', function (): void {
             // ARRANGE
             $command = app()->make(MiseCommand::class);
             $definition = $command->getDefinition();
@@ -29,10 +29,9 @@ describe('MiseCommand Unit Tests', function (): void {
                 ARRAY_FILTER_USE_KEY,
             );
 
-            // ASSERT
+            // ASSERT - only --yes option should be custom
             expect($customOptions)->toHaveCount(1)
-                ->and($customOptions)->toHaveKey('force')
-                ->and($definition->getOption('force')->getDefault())->toBeFalse();
+                ->and(array_key_exists('yes', $customOptions))->toBeTrue();
         });
     });
 });

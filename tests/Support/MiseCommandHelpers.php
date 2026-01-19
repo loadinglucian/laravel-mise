@@ -29,6 +29,8 @@ trait MiseCommandHelpers
      */
     protected function runMise(array $options = []): PendingCommand
     {
+        $options['--yes'] ??= true;
+
         return artisan(MiseCommand::class, $options);
     }
 
