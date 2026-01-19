@@ -30,8 +30,10 @@ abstract class BaseCommand extends Command
 
         $this->line('');
         $this->line('<fg=cyan>▒ ≡</> <fg=cyan;options=bold>Laravel Mise</> <fg=cyan>━━━━━━━━━━━━━━━━</><fg=bright-blue>━━━━━━━━━━━━━━━</><fg=magenta>━━━━━━━━━━━━━━━</><fg=gray>━━━━━━━━━━━━━━━━</>');
-        $this->line('<fg=gray>▒ </>');
-        $this->line('<fg=gray>▒ Ver: '.$version.'</>');
+        $this->out([
+            '<|gray></>',
+            '<|gray>Ver: '.$version.'</>',
+        ]);
     }
 
     /**
@@ -88,7 +90,7 @@ abstract class BaseCommand extends Command
      */
     protected function hr(): void
     {
-        $this->out('────────────────────────────────────────────────────────────');
+        $this->out('────────────────────────────────────────────────────────────────────────────');
     }
 
     /**
