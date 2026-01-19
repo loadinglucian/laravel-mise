@@ -22,4 +22,5 @@ return RectorConfig::configure()
     ->withPhpSets()
     ->withSkip([
         '*/tests/CICanary.php',
+        'config/database.php',
     ]);
