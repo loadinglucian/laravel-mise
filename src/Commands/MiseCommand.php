@@ -232,9 +232,21 @@ class MiseCommand extends BaseCommand
                 $baseCommand[] = $devFlagValue;
             }
 
-            $allCommands = [[...$baseCommand, ...$packageNames], ...$commands];
-            if (! $this->execCommands($allCommands, $commandOptions)) {
+            //
+            // Execute package manager command (without command options)
+
+            $packageManagerCommand = [...$baseCommand, ...$packageNames];
+            if (! $this->execCommands([$packageManagerCommand])) {
                 return false;
+            }
+
+            //
+            // Execute package-specific commands (with command options)
+
+            if (! empty($commands)) {
+                if (! $this->execCommands($commands, $commandOptions)) {
+                    return false;
+                }
             }
 
             //
