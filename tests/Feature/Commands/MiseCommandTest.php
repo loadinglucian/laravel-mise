@@ -341,4 +341,63 @@ describe('MiseCommand Feature Tests', function (): void {
             $result->doesntExpectOutputToContain('Some issues found');
         });
     });
+
+    //
+    // Deferred Execution
+    // ----
+
+    describe('deferred execution', function (): void {
+        it('executes package commands after dump-autoload', function (): void {
+            // ARRANGE
+            $executionOrder = [];
+
+            Process::fake([
+                '*' => function (PendingProcess $process) use (&$executionOrder) {
+                    $command = $this->extractCommand($process);
+
+                    // Track key commands in order
+                    if (str_contains($command, 'dump-autoload')) {
+                        $executionOrder[] = 'dump-autoload';
+                    } elseif (str_contains($command, 'ide-helper:generate')) {
+                        $executionOrder[] = 'ide-helper:generate';
+                    } elseif (str_contains($command, 'run-script post-update-cmd')) {
+                        $executionOrder[] = 'post-update-cmd';
+                    }
+
+                    return Process::result('', '', 0);
+                },
+            ]);
+
+            // ACT
+            $this->runMise()->assertSuccessful();
+
+            // ASSERT - verify execution order
+            $dumpAutoloadIndex = array_search('dump-autoload', $executionOrder);
+            $ideHelperIndex = array_search('ide-helper:generate', $executionOrder);
+            $postUpdateIndex = array_search('post-update-cmd', $executionOrder);
+
+            expect($dumpAutoloadIndex)->toBeLessThan($ideHelperIndex)
+                ->and($ideHelperIndex)->toBeLessThan($postUpdateIndex);
+        });
+
+        it('succeeds when post-update-cmd fails', function (): void {
+            // ARRANGE
+            Process::fake([
+                '*' => function (PendingProcess $process) {
+                    $command = $this->extractCommand($process);
+
+                    if (str_contains($command, 'run-script post-update-cmd')) {
+                        return Process::result('', 'Script error', 1);
+                    }
+
+                    return Process::result('', '', 0);
+                },
+            ]);
+
+            // ACT & ASSERT
+            $this->runMise()->assertSuccessful();
+
+            $this->assertCommandRan('composer run-script post-update-cmd');
+        });
+    });
 });
