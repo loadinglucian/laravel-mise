@@ -14,7 +14,7 @@ declare(strict_types=1);
 */
 
 // Architecture Tests: Architecture rules and best practices
-pest()->extend(Tests\FeatureTestCase::class)
+pest()->extend(Tests\TestCase::class)
     ->in('Arch');
 
 // Feature Tests: Full HTTP stack end-to-end tests
