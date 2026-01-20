@@ -44,7 +44,6 @@ return [
                 ['vendor/bin/deployer', 'scaffold:crons'],
                 ['vendor/bin/deployer', 'scaffold:hooks'],
                 ['vendor/bin/deployer', 'scaffold:supervisors'],
-                ['vendor/bin/deployer', 'scaffold:workflows'],
             ],
             'command_options' => ['destination', 'force'],
         ],
