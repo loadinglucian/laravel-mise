@@ -82,12 +82,12 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
-        return $this->model->paginate($perPage);
+        return $this->model->newQuery()->paginate($perPage);
     }
 
     public function count(): int
     {
-        return $this->model->count();
+        return $this->model->newQuery()->count();
     }
 
     public function exists(int $id): bool
