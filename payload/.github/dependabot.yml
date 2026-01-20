@@ -28,9 +28,6 @@ updates:
     target-branch: 'main'
     versioning-strategy: 'increase'
     open-pull-requests-limit: 10
-    labels:
-      - 'dependencies'
-      - 'php'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
@@ -45,9 +42,6 @@ updates:
       interval: 'daily'
     target-branch: 'main'
     open-pull-requests-limit: 10
-    labels:
-      - 'dependencies'
-      - 'javascript'
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
