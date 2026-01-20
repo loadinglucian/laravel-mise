@@ -6,6 +6,7 @@ namespace LaravelMise\Services;
 
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Process;
+use Symfony\Component\Process\Process as SymfonyProcess;
 
 //
 // Process Service - Shell Command Execution
@@ -30,8 +31,8 @@ readonly class ProcessService
     {
         $process = Process::command($command);
 
-        // Use TTY when: no callback needed AND environment supports it
-        if ($this->shouldUseTty($outputCallback)) {
+        // Use TTY when environment supports it (native terminal output with colors)
+        if ($this->shouldUseTty()) {
             return $process->tty()->run();
         }
 
@@ -47,12 +48,10 @@ readonly class ProcessService
      *
      * TTY provides native terminal output (colors, progress bars).
      * Extracted to allow testing of TTY code path.
-     *
-     * @param  (callable(string): void)|null  $outputCallback
      */
-    protected function shouldUseTty(?callable $outputCallback): bool
+    protected function shouldUseTty(): bool
     {
-        return $outputCallback === null
+        return SymfonyProcess::isTtySupported()
             && 'Windows' !== PHP_OS_FAMILY
             && ! app()->runningUnitTests();
     }
