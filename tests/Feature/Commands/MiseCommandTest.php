@@ -197,26 +197,6 @@ describe('MiseCommand Feature Tests', function (): void {
             $this->assertCommandRan('composer update');
         });
 
-        it('displays generic error when no error output available', function (): void {
-            // ARRANGE
-            Process::fake([
-                '*' => function (PendingProcess $process) {
-                    $command = $this->extractCommand($process);
-
-                    // Command fails with empty error output
-                    if (str_contains($command, 'composer update')) {
-                        return Process::result('', '', 1);
-                    }
-
-                    return Process::result('', '', 0);
-                },
-            ]);
-
-            // ACT
-            $this->runMise()
-                ->expectsOutputToContain('Failed to run command')
-                ->assertSuccessful();
-        });
     });
 
     //
@@ -333,6 +313,30 @@ describe('MiseCommand Feature Tests', function (): void {
 
                 return str_contains($command, 'livewire:publish') && str_contains($command, '--destination');
             });
+        });
+
+        it('suppresses error output when ignore_errors option is set', function (): void {
+            // ARRANGE
+            // rector and pint have ignore_errors option, so their failures should not show error output
+            Process::fake([
+                '*' => function (PendingProcess $process) {
+                    $command = $this->extractCommand($process);
+
+                    // Rector and pint fail with exit code 1 (issues found)
+                    if (str_contains($command, 'vendor/bin/rector') || str_contains($command, 'vendor/bin/pint')) {
+                        return Process::result('', 'Some issues found', 1);
+                    }
+
+                    return Process::result('', '', 0);
+                },
+            ]);
+
+            // ACT
+            $result = $this->runMise();
+
+            // ASSERT - command succeeds and error output is suppressed
+            $result->assertSuccessful();
+            $result->doesntExpectOutputToContain('Some issues found');
         });
     });
 });

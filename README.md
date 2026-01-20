@@ -268,13 +268,6 @@ The Flux configuration is published automatically during installation. However, 
 > [!NOTE]
 > For complete Flux setup including asset publishing and layout configuration, follow the [official Flux installation guide](https://fluxui.dev/docs/installation). You'll need to add the `@fluxAppearance` and `@fluxScripts` directives to your layout file.
 
-**Tailwind CSS:**
-
-The Tailwind packages are installed, but you'll need to configure Vite:
-
-> [!NOTE]
-> Import the Tailwind Vite plugin in your `vite.config.js` and add `@import "tailwindcss";` to your CSS file. For detailed instructions, see the [official Tailwind CSS Vite guide](https://tailwindcss.com/docs/installation/using-vite).
-
 <a name="license"></a>
 
 ## License

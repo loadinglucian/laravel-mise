@@ -147,7 +147,7 @@ class MiseCommand extends BaseCommand
         } else {
             foreach ($envFiles as $file) {
                 $this->env->updateVariables($file, $sessionConfig);
-                $this->info('Updated '.basename($file));
+                $this->yay('Updated '.basename($file));
             }
         }
 
@@ -291,7 +291,7 @@ class MiseCommand extends BaseCommand
                     try {
                         $result = $this->composerJson->update($composerConfig);
                         if ($result['updated']) {
-                            $this->info('Updated composer.json sections: '.implode(', ', $result['sections']));
+                            $this->yay('Updated composer.json sections: '.implode(', ', $result['sections']));
                         } else {
                             $this->out('No changes needed for composer.json');
                         }
@@ -314,7 +314,7 @@ class MiseCommand extends BaseCommand
      *
      * @param  array<string>  $command
      */
-    protected function runProcess(array $command): void
+    protected function runProcess(array $command, bool $ignoreErrors = false): void
     {
         $this->out('$> '.implode(' ', $command));
         $result = $this->process->run(
@@ -322,12 +322,10 @@ class MiseCommand extends BaseCommand
             fn (string $output) => $this->output->write($output)
         );
 
-        if (! $result->successful()) {
+        if (! $result->successful() && ! $ignoreErrors) {
             $errorOutput = $result->errorOutput();
             if ($errorOutput) {
                 $this->nay($errorOutput);
-            } else {
-                $this->nay('Failed to run command');
             }
 
             if (! app()->runningUnitTests()) {
@@ -344,6 +342,8 @@ class MiseCommand extends BaseCommand
      */
     protected function runProcesses(array $commands, array $commandOptions = []): void
     {
+        $ignoreErrors = in_array('ignore_errors', $commandOptions, true);
+
         foreach ($commands as $command) {
             //
             // Inject dynamic options
@@ -357,7 +357,7 @@ class MiseCommand extends BaseCommand
                 $command[] = '--force';
             }
 
-            $this->runProcess($command);
+            $this->runProcess($command, $ignoreErrors);
         }
     }
 

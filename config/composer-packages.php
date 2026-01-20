@@ -76,16 +76,19 @@ return [
             'post_payload_commands' => [
                 ['vendor/bin/rector'],
             ],
+            'command_options' => ['ignore_errors'],
         ],
         'laravel/pint' => [
             'post_payload_commands' => [
                 ['vendor/bin/pint', '--repair'],
             ],
+            'command_options' => ['ignore_errors'],
         ],
         'larastan/larastan' => [
             'post_payload_commands' => [
                 ['vendor/bin/phpstan', 'analyse'],
             ],
+            'command_options' => ['ignore_errors'],
         ],
         'pestphp/pest',
         'pestphp/pest-plugin-arch',

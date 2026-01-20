@@ -16,10 +16,10 @@ use LaravelMise\Services\ProcessService;
 readonly class TtyEnabledProcessService extends ProcessService
 {
     #[\Override]
-    protected function shouldUseTty(?callable $outputCallback): bool
+    protected function shouldUseTty(): bool
     {
         // Force TTY mode regardless of environment
-        return $outputCallback === null;
+        return true;
     }
 }
 
@@ -39,9 +39,9 @@ readonly class TestableProcessService extends ProcessService
     ) {}
 
     #[\Override]
-    protected function shouldUseTty(?callable $outputCallback): bool
+    protected function shouldUseTty(): bool
     {
-        $this->capture->lastTtyDecision = parent::shouldUseTty($outputCallback);
+        $this->capture->lastTtyDecision = parent::shouldUseTty();
 
         return $this->capture->lastTtyDecision;
     }
@@ -62,19 +62,7 @@ describe('ProcessService', function (): void {
     // ----
 
     describe('shouldUseTty() behavior', function (): void {
-        it('disables TTY when callback is provided', function (): void {
-            // ARRANGE
-            Process::fake(['*' => Process::result('output', '', 0)]);
-            $testable = new TestableProcessService;
-
-            // ACT
-            $testable->run(['echo', 'test'], fn () => null);
-
-            // ASSERT - callback provided means no TTY
-            expect($testable->getLastTtyDecision())->toBeFalse();
-        });
-
-        it('disables TTY during unit tests (even with null callback)', function (): void {
+        it('disables TTY during unit tests', function (): void {
             // ARRANGE
             Process::fake(['*' => Process::result('output', '', 0)]);
             $testable = new TestableProcessService;

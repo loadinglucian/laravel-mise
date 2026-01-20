@@ -118,11 +118,13 @@ trait MiseCommandHelpers
                     'post_payload_commands' => [
                         ['vendor/bin/rector'],
                     ],
+                    'command_options' => ['ignore_errors'],
                 ],
                 'laravel/pint' => [
                     'post_payload_commands' => [
                         ['vendor/bin/pint', '--repair'],
                     ],
+                    'command_options' => ['ignore_errors'],
                 ],
                 'roave/security-advisories:dev-latest',
             ],
