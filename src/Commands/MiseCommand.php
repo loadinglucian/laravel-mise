@@ -33,8 +33,11 @@ class MiseCommand extends BaseCommand
     protected $description = 'Laravel Mise en Place';
 
     // ----
-    // Post-Payload Commands Collection
+    // Deferred Commands Collection
     // ----
+
+    /** @var array<array{command: array<string>, options: array<string>}> */
+    protected array $deferredPackageCommands = [];
 
     /** @var array<array{command: array<string>, options: array<string>}> */
     protected array $postPayloadCommands = [];
@@ -85,7 +88,7 @@ class MiseCommand extends BaseCommand
 
         $this->h1('Installing Composer Packages');
 
-        $this->runProcess(['composer', 'update']);
+        $this->runProcess(['composer', 'update', '--no-scripts']);
 
         $composerPackages = config('laravel-mise.composer-packages');
 
@@ -96,7 +99,19 @@ class MiseCommand extends BaseCommand
         }
 
         /** @var array<string, array<string|array<string, array<array<string>>|array<string, mixed>>>> $composerPackages */
-        $this->installPackages($composerPackages, ['composer', 'require'], 'require-dev', '--dev');
+        $this->installPackages($composerPackages, ['composer', 'require', '--no-scripts'], 'require-dev', '--dev');
+
+        //
+        // Trigger Deferred Composer Scripts
+        // ----
+
+        $this->runProcess(['composer', 'dump-autoload']);
+
+        foreach ($this->deferredPackageCommands as $cmdEntry) {
+            $this->runProcesses([$cmdEntry['command']], $cmdEntry['options']);
+        }
+
+        $this->runProcess(['composer', 'run-script', 'post-update-cmd'], ignoreErrors: true);
 
         //
         // Node Package Installation
@@ -267,10 +282,15 @@ class MiseCommand extends BaseCommand
             $this->runProcesses([$packageManagerCommand]);
 
             //
-            // Execute each package's commands with only that package's options
+            // Collect package commands for deferred execution (after dump-autoload)
 
             foreach ($packageCommands as $pkgCmd) {
-                $this->runProcesses($pkgCmd['commands'], $pkgCmd['options']);
+                foreach ($pkgCmd['commands'] as $cmd) {
+                    $this->deferredPackageCommands[] = [
+                        'command' => $cmd,
+                        'options' => $pkgCmd['options'],
+                    ];
+                }
             }
 
             //
