@@ -43,7 +43,7 @@ Don't worry — if you're running a recent Laravel installation, you'll already 
 You may install the package via Composer:
 
 ```shell
-composer require --dev loadinglucian/laravel-mise:dev-main
+composer require --dev loadinglucian/laravel-mise
 ```
 
 > [!NOTE]
@@ -72,7 +72,7 @@ Start with a fresh Laravel project and run the mise command:
 ```shell
 laravel new my-project
 cd my-project
-composer require --dev loadinglucian/laravel-mise:dev-main
+composer require --dev loadinglucian/laravel-mise
 php artisan mise
 ```
 
