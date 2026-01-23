@@ -40,7 +40,7 @@ return [
         ],
         'loadinglucian/deployer-php' => [
             'commands' => [
-                ['vendor/bin/deployer', 'scaffold:ai'],
+                ['vendor/bin/deployer', 'scaffold:ai', '--agent=claude'],
                 ['vendor/bin/deployer', 'scaffold:crons'],
                 ['vendor/bin/deployer', 'scaffold:hooks'],
                 ['vendor/bin/deployer', 'scaffold:supervisors'],
