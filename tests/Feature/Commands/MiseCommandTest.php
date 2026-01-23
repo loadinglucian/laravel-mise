@@ -37,7 +37,7 @@ describe('MiseCommand Feature Tests', function (): void {
             ->assertSuccessful();
 
         // ASSERT
-        $this->assertCommandRan('composer update --no-scripts');
+        $this->assertCommandRan('composer update -W --no-scripts');
         $this->assertCommandRan('composer dump-autoload');
         $this->assertCommandRan('composer run-script post-update-cmd');
     });
@@ -75,7 +75,7 @@ describe('MiseCommand Feature Tests', function (): void {
                 ->assertSuccessful();
 
             // ASSERT
-            $this->assertCommandRan('composer update --no-scripts');
+            $this->assertCommandRan('composer update -W --no-scripts');
         });
 
         it('skips confirmation when --yes flag provided', function (): void {
@@ -84,7 +84,7 @@ describe('MiseCommand Feature Tests', function (): void {
                 ->assertSuccessful();
 
             // ASSERT - commands ran without confirmation prompt
-            $this->assertCommandRan('composer update --no-scripts');
+            $this->assertCommandRan('composer update -W --no-scripts');
         });
     });
 
@@ -155,8 +155,8 @@ describe('MiseCommand Feature Tests', function (): void {
                 ->assertSuccessful();
 
             // ASSERT - composer update ran and subsequent commands still executed
-            $this->assertCommandRan('composer update --no-scripts');
-            $this->assertCommandRan('composer require --no-scripts');
+            $this->assertCommandRan('composer update -W --no-scripts');
+            $this->assertCommandRan('composer require -W --no-scripts');
         });
 
         it('continues when npm update fails (soft error)', function (): void {
@@ -196,7 +196,7 @@ describe('MiseCommand Feature Tests', function (): void {
                 ->assertSuccessful();
 
             // ASSERT
-            $this->assertCommandRan('composer update --no-scripts');
+            $this->assertCommandRan('composer update -W --no-scripts');
         });
 
     });
