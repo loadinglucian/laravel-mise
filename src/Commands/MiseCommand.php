@@ -88,7 +88,7 @@ class MiseCommand extends BaseCommand
 
         $this->h1('Installing Composer Packages');
 
-        $this->runProcess(['composer', 'update', '--no-scripts']);
+        $this->runProcess(['composer', 'update', '-W', '--no-scripts']);
 
         $composerPackages = config('laravel-mise.composer-packages');
 
@@ -99,7 +99,7 @@ class MiseCommand extends BaseCommand
         }
 
         /** @var array<string, array<string|array<string, array<array<string>>|array<string, mixed>>>> $composerPackages */
-        $this->installPackages($composerPackages, ['composer', 'require', '--no-scripts'], 'require-dev', '--dev');
+        $this->installPackages($composerPackages, ['composer', 'require', '-W', '--no-scripts'], 'require-dev', '--dev');
 
         //
         // Trigger Deferred Composer Scripts
