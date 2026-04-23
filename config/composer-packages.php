@@ -47,11 +47,6 @@ return [
             ],
             'command_options' => ['destination', 'force'],
         ],
-        'barryvdh/laravel-debugbar' => [
-            'commands' => [
-                ['php', 'artisan', 'vendor:publish', '--provider=Barryvdh\Debugbar\ServiceProvider'],
-            ],
-        ],
         'barryvdh/laravel-ide-helper' => [
             'composer' => [
                 'scripts' => [
